@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oposicions Generalitat · Cuestionarios</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8f7f4;
+      --surface: #ffffff;
+      --surface2: #f1f0ed;
+      --border: rgba(0,0,0,0.1);
+      --border-strong: rgba(0,0,0,0.2);
+      --text: #1a1a18;
+      --text2: #5a5a56;
+      --text3: #9a9a94;
+      --accent: #1a1a18;
+      --accent-light: #f1f0ed;
+      --ok: #1a7a4a;
+      --ok-bg: #eaf5ee;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #18181a;
+        --surface: #222224;
+        --surface2: #2a2a2c;
+        --border: rgba(255,255,255,0.1);
+        --border-strong: rgba(255,255,255,0.2);
+        --text: #f0efec;
+        --text2: #a0a09a;
+        --text3: #606060;
+        --accent: #f0efec;
+        --accent-light: #2a2a2c;
+        --ok: #4caf7a;
+        --ok-bg: rgba(76,175,122,0.12);
+        --shadow: 0 1px 4px rgba(0,0,0,0.3);
+      }
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    /* ── Header ── */
+    header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      margin-bottom: 0.75rem;
+    }
+
+    header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 14px;
+      color: var(--text2);
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 0.5rem;
+      padding: 0 0.25rem;
+    }
+
+    .card-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .card-link {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      padding: 0.9rem 1rem;
+      text-decoration: none;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 60px;
+    }
+
+    .card-link:last-child {
+      border-bottom: none;
+    }
+
+    .card-link:active,
+    .card-link:hover {
+      background: var(--surface2);
+    }
+
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--ok-bg);
+      color: var(--ok);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 17px;
+    }
+
+    .card-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-name {
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .card-chevron {
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    footer a {
+      color: var(--text2);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+
+    <header>
+      <div class="badge">Generalitat de Catalunya</div>
+      <h1>Cuestionarios Oposiciones</h1>
+      <p>Selecciona un cuestionario para practicar</p>
+    </header>
+
+    <!-- TEMA 1 -->
+    <div class="section">
+      <div class="section-title">Tema 1</div>
+      <div class="card-list">
+        <a class="card-link" href="cuestionario_tema1_generalitat_1.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 1 — Cuestionario 1</div>
+            <div class="card-sub">Primera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema1_v2_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 1 — Cuestionario 2</div>
+            <div class="card-sub">Segunda versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- TEMA 2 -->
+    <div class="section">
+      <div class="section-title">Tema 2</div>
+      <div class="card-list">
+        <a class="card-link" href="cuestionario_tema2_v1_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 2 — Cuestionario 1</div>
+            <div class="card-sub">Primera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema2_v2_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 2 — Cuestionario 2</div>
+            <div class="card-sub">Segunda versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema2_v3_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 2 — Cuestionario 3</div>
+            <div class="card-sub">Tercera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- TEMA 3 -->
+    <div class="section">
+      <div class="section-title">Tema 3</div>
+      <div class="card-list">
+        <a class="card-link" href="cuestionario_tema3_v1_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 3 — Cuestionario 1</div>
+            <div class="card-sub">Primera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema3_v2_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 3 — Cuestionario 2</div>
+            <div class="card-sub">Segunda versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema3_v3_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 3 — Cuestionario 3</div>
+            <div class="card-sub">Tercera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- TEMA 5 -->
+    <div class="section">
+      <div class="section-title">Tema 5</div>
+      <div class="card-list">
+        <a class="card-link" href="cuestionario_tema5_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 5 — Cuestionario 1</div>
+            <div class="card-sub">Primera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema5_v2_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 5 — Cuestionario 2</div>
+            <div class="card-sub">Segunda versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema5_v3_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 5 — Cuestionario 3</div>
+            <div class="card-sub">Tercera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- TEMA 6 -->
+    <div class="section">
+      <div class="section-title">Tema 6</div>
+      <div class="card-list">
+        <a class="card-link" href="cuestionario_tema6_v1_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 6 — Cuestionario 1</div>
+            <div class="card-sub">Primera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema6_v2_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 6 — Cuestionario 2</div>
+            <div class="card-sub">Segunda versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a class="card-link" href="cuestionario_tema6_v3_generalitat.html">
+          <div class="card-icon">📝</div>
+          <div class="card-body">
+            <div class="card-name">Tema 6 — Cuestionario 3</div>
+            <div class="card-sub">Tercera versión</div>
+          </div>
+          <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <footer>
+      <p>Oposicions Generalitat de Catalunya &nbsp;·&nbsp;
+        <a href="https://github.com/Gottxxx/Oposiciones-Generalitat" target="_blank">GitHub</a>
+      </p>
+    </footer>
+
+  </div>
+</body>
+</html>
