@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 1 · Test 2 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7f4; --surface: #ffffff; --surface2: #f1f0ed;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+    --ok: #1a7a4a; --ok-bg: #eaf5ee; --ok-border: rgba(26,122,74,0.25);
+    --err: #c0392b; --err-bg: #fdf0ee; --err-border: rgba(192,57,43,0.25);
+    --accent: #1a1a18; --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181a; --surface: #222224; --surface2: #2a2a2c;
+      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+      --text: #f0efec; --text2: #a0a09a; --text3: #606060;
+      --ok: #4caf7a; --ok-bg: rgba(76,175,122,0.12); --ok-border: rgba(76,175,122,0.3);
+      --err: #e57373; --err-bg: rgba(229,115,115,0.12); --err-border: rgba(229,115,115,0.3);
+      --accent: #f0efec;
+    }
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; display: flex; align-items: flex-start;
+    justify-content: center; padding: 2rem 1rem 4rem;
+  }
+  #app { width: 100%; max-width: 680px; }
+  #header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  #header h1 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+  #header p { font-size: 13px; color: var(--text3); }
+  #pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-strong); color: var(--text2); background: var(--surface2); white-space: nowrap; flex-shrink: 0; }
+  #progress-wrap { margin-bottom: 1.25rem; }
+  #progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 7px; }
+  #progress-row span:last-child { font-weight: 500; color: var(--text2); }
+  #track { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  #fill { height: 3px; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+  #stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  #sc-ok .val { color: var(--ok); }
+  #sc-err .val { color: var(--err); }
+  #q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  #q-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #q-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); display: inline-block; }
+  #q-text { font-size: 16px; color: var(--text); line-height: 1.65; }
+  #options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; line-height: 1.55; transition: border-color 0.15s, background 0.15s, transform 0.1s; width: 100%; }
+  .opt:hover:not(.disabled) { border-color: var(--border-strong); background: var(--surface2); transform: translateY(-1px); }
+  .opt:active:not(.disabled) { transform: translateY(0); }
+  .letter { min-width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; margin-top: 1px; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
+  .opt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { border-color: var(--err-border); background: var(--err-bg); }
+  .opt.wrong .letter { background: var(--err); border-color: var(--err); color: #fff; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  #feedback { display: none; border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 1rem; border: 1px solid; font-size: 13px; line-height: 1.65; }
+  #feedback.show { display: block; }
+  #feedback.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+  #feedback.err { background: var(--err-bg); border-color: var(--err-border); }
+  #feedback .fb-head { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+  #feedback.ok .fb-head { color: var(--ok); }
+  #feedback.err .fb-head { color: var(--err); }
+  #feedback .fb-body { color: var(--text2); }
+  #btn-row { display: flex; justify-content: flex-end; }
+  #btn-next { display: none; font-size: 13px; font-weight: 500; padding: 10px 20px; border-radius: var(--radius-sm); background: var(--accent); color: var(--bg); border: none; cursor: pointer; transition: opacity 0.15s; letter-spacing: -0.01em; }
+  #btn-next:hover { opacity: 0.85; }
+  #results { display: none; padding: 1rem 0; }
+  #res-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 2rem; }
+  #res-pct { font-size: 64px; font-weight: 700; color: var(--text); letter-spacing: -0.04em; line-height: 1; flex-shrink: 0; }
+  #res-info h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; letter-spacing: -0.01em; }
+  #res-info p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  #res-btns { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-sec { font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; transition: background 0.15s; }
+  .btn-sec:hover { background: var(--surface2); }
+  .btn-prim { background: var(--accent); color: var(--bg); border-color: transparent; }
+  .btn-prim:hover { opacity: 0.85; background: var(--accent); }
+  #fallos-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  #fallos-section h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .fallo { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .fallo:last-child { border-bottom: none; }
+  .fallo-q { font-size: 14px; color: var(--text); margin-bottom: 8px; line-height: 1.5; font-weight: 500; }
+  .fallo-badges { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .badge.err { background: var(--err-bg); border-color: var(--err-border); color: var(--err); }
+  .badge.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .fallo-exp { font-size: 12px; color: var(--text3); line-height: 1.6; }
+  @media (max-width: 500px) {
+    body { padding: 1rem 0.75rem 3rem; }
+    #res-hero { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    #res-pct { font-size: 48px; }
+    #header { flex-direction: column; gap: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <h1>Tema 1 · Test 2 · Oposición Generalitat</h1>
+      <p>45 preguntas nuevas · Soberanía, lengua, garantías, EAC y trampas cruzadas</p>
+    </div>
+    <div id="pill"></div>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-row"><span>Progreso</span><span id="prog-num">1 / 45</span></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">45</div></div>
+  </div>
+  <div id="q-card">
+    <div id="q-meta"><span id="q-num-lbl"></span><span class="dot"></span><span id="q-bloque-lbl"></span></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info"><h2 id="res-title"></h2><p id="res-sub"></p></div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_Q = [
+  {b:"A. Estructura CE",q:"La Constitución Española tiene en total:",opts:["169 artículos, Título Preliminar y Títulos I a X","170 artículos y Título Preliminar","169 artículos agrupados en 9 títulos sin Título Preliminar","168 artículos y Título Preliminar"],c:0,f:"Literal imprescindible: 169 artículos, Título Preliminar, Títulos I a X, 4 disposiciones adicionales, 9 transitorias, 1 derogatoria y 1 final. Dato exacto que cae en test."},
+  {b:"A. Estructura CE",q:"La Corona se regula en el:",opts:["Título I","Título II","Título III","Título X"],c:1,f:"Título II = Corona. Título III = Cortes Generales. Título IV = Gobierno y Administración. Título X = reforma constitucional. Ancla: II = Corona, III = Cortes."},
+  {b:"A. Estructura CE",q:"El Tribunal Constitucional actúa como:",opts:["órgano consultivo del Gobierno","garante exclusivo de los estatutos de autonomía","intérprete supremo de la Constitución","órgano jurisdiccional del Senado"],c:2,f:"El TC es el intérprete supremo de la Constitución. No es órgano consultivo ni jurisdicción ordinaria. Dato textual del resumen."},
+  {b:"A. Estructura CE",q:"La idea 'DOGMÁTICA = principios y derechos; ORGÁNICA = órganos y poder' sirve para:",opts:["distinguir el sistema electoral del judicial","clasificar la CE por bloques funcionales","diferenciar leyes orgánicas de ordinarias","clasificar competencias estatales y autonómicas"],c:1,f:"Es la ancla rápida del resumen para estructurar la CE. No tiene que ver con leyes orgánicas ni con competencias."},
+  {b:"B. Título Preliminar",q:"La soberanía nacional reside en:",opts:["el Rey","las Cortes Generales","el pueblo español","el Gobierno"],c:2,f:"Art. 1 CE: la soberanía nacional reside en el pueblo español, del que emanan los poderes del Estado. Dato literal frecuente."},
+  {b:"B. Título Preliminar",q:"La forma política del Estado español es:",opts:["república presidencialista","monarquía absoluta","monarquía parlamentaria","república parlamentaria"],c:2,f:"Art. 1 CE fija la monarquía parlamentaria como forma política del Estado. No confundir con la definición de Estado social y democrático de Derecho, que es la fórmula del tipo de Estado."},
+  {b:"B. Título Preliminar",q:"El castellano como lengua oficial del Estado se regula en el:",opts:["art. 2 CE","art. 3 CE","art. 4 CE","art. 6 CE"],c:1,f:"Art. 3 CE: el castellano es la lengua oficial del Estado; las demás lenguas españolas también serán oficiales en las respectivas Comunidades Autónomas. Art. 4 = bandera. Art. 6 = partidos."},
+  {b:"B. Título Preliminar",q:"Los sindicatos y asociaciones empresariales se recogen en el:",opts:["art. 5 CE","art. 6 CE","art. 7 CE","art. 8 CE"],c:2,f:"Art. 7 CE = sindicatos y asociaciones empresariales. Art. 6 = partidos políticos. Art. 8 = Fuerzas Armadas. Este trío artículo-contenido es una trampa clásica de test."},
+  {b:"B. Título Preliminar",q:"La capital del Estado español, según el Título Preliminar, es:",opts:["Barcelona","Sevilla","Madrid","Toledo"],c:2,f:"Art. 5 CE: la capital del Estado es la villa de Madrid. Dato directo y muy literal — no hay trampa aquí, pero el examen lo usa para ver si estudias o recitas."},
+  {b:"B. Título Preliminar",q:"La afirmación 'todos los poderes quedan sometidos a la ley' corresponde a la idea de:",opts:["Estado social","Estado democrático","Estado de Derecho","Estado autonómico"],c:2,f:"Estado de Derecho = sometimiento de todos los poderes a la ley. Estado social = intervención para promover bienestar. Estado democrático = soberanía popular y participación. No mezclar."},
+  {b:"B. Título Preliminar",q:"¿Cuál de estos principios pertenece al art. 9.3 CE?",opts:["pluralismo político","monarquía parlamentaria","publicidad de las normas","solidaridad entre nacionalidades"],c:2,f:"Art. 9.3 CE: legalidad, jerarquía normativa, publicidad de las normas, irretroactividad, seguridad jurídica, responsabilidad e interdicción de la arbitrariedad. Los otros tres son del art. 1 o art. 2."},
+  {b:"C. Reforma constitucional",q:"La iniciativa de reforma constitucional corresponde, entre otros, a:",opts:["cualquier ciudadano mediante petición popular directa","las Asambleas de las Comunidades Autónomas","los Municipios con más de 50.000 habitantes","los colegios profesionales"],c:1,f:"Art. 166 CE: la reforma puede proponerla el Gobierno, el Congreso, el Senado y las Asambleas de las CC.AA. No existe iniciativa popular directa de reforma constitucional."},
+  {b:"C. Reforma constitucional",q:"No puede iniciarse la reforma constitucional durante los estados de alarma porque:",opts:["lo prohíbe el art. 167 CE","lo prohíbe el art. 168 CE","lo prohíbe el art. 169 CE","lo prohíbe el art. 166 CE"],c:2,f:"Art. 169 CE: la reforma no puede iniciarse en tiempo de guerra ni durante los estados del art. 116 CE (alarma, excepción y sitio). El art. 167 y 168 regulan los procedimientos, no el límite temporal."},
+  {b:"C. Reforma constitucional",q:"¿Qué parte de la CE queda blindada por el procedimiento agravado del art. 168?",opts:["solo el Título I completo","solo el Título X","Título Preliminar, Sección 1.ª del Cap. II del Título I y Título II","cualquier título que afecte a derechos fundamentales"],c:2,f:"Procedimiento agravado del art. 168: Título Preliminar + Sección 1.ª del Capítulo II del Título I (arts. 15-29) + Título II (Corona). Solo esas tres partes, no todo el Título I."},
+  {b:"C. Reforma constitucional",q:"En el procedimiento ordinario del art. 167 CE, las Cámaras deben aprobar la reforma por:",opts:["mayoría simple","mayoría absoluta","3/5 de cada Cámara","2/3 de cada Cámara"],c:2,f:"Art. 167 CE = 3/5 de cada Cámara. Si no hay acuerdo, comisión mixta y luego mayoría absoluta del Senado + 2/3 del Congreso. No confundir los 3/5 del 167 con los 2/3 del 168."},
+  {b:"C. Reforma constitucional",q:"El procedimiento agravado del art. 168 CE incluye como paso obligatorio:",opts:["referéndum opcional a petición de 1/10 de los miembros de una Cámara","disolución automática de las Cortes y referéndum obligatorio","aprobación por mayoría absoluta de cada Cámara y referéndum opcional","aprobación por 3/5 y ratificación por nuevas Cortes sin referéndum"],c:1,f:"Art. 168: 2/3 cada Cámara → disolución automática → nuevas Cortes aprueban por 2/3 → referéndum obligatorio de ratificación. Los cuatro pasos son necesarios."},
+  {b:"D. Título I CE",q:"El art. 10 CE establece que los derechos fundamentales se interpretan conforme a:",opts:["los tratados de la UE exclusivamente","la Declaración Universal de Derechos Humanos y los tratados internacionales ratificados por España","la jurisprudencia del Tribunal Supremo","el criterio del Tribunal Constitucional sin referencia exterior"],c:1,f:"Art. 10.2 CE: las normas relativas a derechos fundamentales se interpretarán de conformidad con la Declaración Universal de Derechos Humanos y los tratados internacionales ratificados por España."},
+  {b:"D. Título I CE",q:"La estructura del Título I de la CE se organiza en:",opts:["dos capítulos y una sección","cinco capítulos","un capítulo único con secciones","Preámbulo y cuatro títulos"],c:1,f:"Título I = 5 capítulos. Cap. I: españoles y extranjeros. Cap. II (con 2 secciones): derechos y libertades. Cap. III: principios rectores. Cap. IV: garantías. Cap. V: suspensión de derechos."},
+  {b:"D. Título I CE",q:"El sistema de garantías de los derechos fundamentales (art. 53 CE) establece que la tutela especial vía amparo corresponde a:",opts:["todos los derechos del Título I","solo los del Capítulo III","los derechos del art. 14 y la Sección 1.ª del Capítulo II (arts. 15-29)","solo los derechos del Capítulo II sin el art. 14"],c:2,f:"Art. 53.2 CE: el recurso de amparo protege el art. 14 y los arts. 15 a 29 (Sección 1.ª Cap. II). Los del Cap. III no tienen amparo; solo pueden invocarse ante la jurisdicción ordinaria según sus leyes de desarrollo."},
+  {b:"D. Título I CE",q:"Los derechos del Capítulo III del Título I (principios rectores) se caracterizan por:",opts:["ser directamente invocables ante cualquier tribunal sin ley de desarrollo","tener la misma protección que los derechos fundamentales","orientar la acción de los poderes públicos y requerir ley de desarrollo para ser alegables","tener protección reforzada vía amparo constitucional"],c:2,f:"Los principios rectores del Cap. III (salud, vivienda, medio ambiente...) informan la acción pública pero solo pueden alegarse ante la jurisdicción ordinaria conforme a las leyes que los desarrollen. No tienen amparo."},
+  {b:"D. Título I CE",q:"La suspensión de derechos fundamentales de forma individual (sin estado de excepción) se regula en el:",opts:["art. 53 CE","art. 54 CE","art. 55.2 CE","art. 30 CE"],c:2,f:"Art. 55.2 CE: permite suspender individualmente ciertos derechos (arts. 17.2 y 18.2 y 3) en investigaciones sobre terrorismo o bandas armadas, con control judicial y parlamentario. Distinto de la suspensión colectiva del 55.1."},
+  {b:"E. Arts. 15-29 CE — derechos específicos",q:"El derecho a la educación y la libertad de enseñanza se reconocen en el art.:",opts:["25 CE","26 CE","27 CE","28 CE"],c:2,f:"Art. 27 CE: derecho a la educación y libertad de enseñanza. Art. 25 = legalidad sancionadora. Art. 26 = prohibición de tribunales de honor. Art. 28 = libertad sindical y huelga."},
+  {b:"E. Arts. 15-29 CE — derechos específicos",q:"La libertad sindical y el derecho a la huelga se reconocen en el art.:",opts:["26 CE","27 CE","28 CE","29 CE"],c:2,f:"Art. 28 CE: libertad sindical (28.1) y derecho a la huelga de los trabajadores (28.2). Art. 29 = derecho de petición."},
+  {b:"E. Arts. 15-29 CE — derechos específicos",q:"El derecho de petición individual y colectiva se recoge en el art.:",opts:["27 CE","28 CE","29 CE","30 CE"],c:2,f:"Art. 29 CE: derecho de petición. Cierra el bloque de derechos fundamentales en sentido estricto (15-29). El art. 30 ya está fuera de ese tramo."},
+  {b:"E. Arts. 15-29 CE — derechos específicos",q:"Confundir los arts. 27, 28 y 29 CE por orden es una trampa porque:",opts:["los tres regulan lo mismo","el examen usa esos artículos mezclados para ver si los tienes fijados","son irrelevantes para la oposición","pertenecen al Capítulo III, no al II"],c:1,f:"27=educación, 28=sindicatos y huelga, 29=petición. El examen los usa como trío de confusión. Memoriza en orden y queda resuelto."},
+  {b:"F. Deberes y derechos sociales",q:"El deber de contribuir al sostenimiento de los gastos públicos se encuentra en el art.:",opts:["29 CE","30 CE","31 CE","32 CE"],c:2,f:"Art. 31 CE: todos contribuirán al sostenimiento de los gastos públicos según su capacidad económica mediante un sistema tributario justo. Art. 30 = deberes militares y objeción de conciencia. Art. 32 = matrimonio."},
+  {b:"F. Deberes y derechos sociales",q:"El matrimonio como institución se regula en el art.:",opts:["30 CE","31 CE","32 CE","33 CE"],c:2,f:"Art. 32 CE: el hombre y la mujer tienen derecho a contraer matrimonio con plena igualdad jurídica. Art. 33 = derecho a la propiedad privada y a la herencia."},
+  {b:"F. Deberes y derechos sociales",q:"El derecho a la huelga y el deber de contribuir fiscalmente son, respectivamente:",opts:["ambos derechos fundamentales en sentido estricto","un derecho fundamental y un deber constitucional","ambos principios rectores","un principio rector y un derecho social"],c:1,f:"La huelga está en el art. 28 (Sección 1.ª Cap. II = derecho fundamental). El deber de contribuir está en el art. 31 (Cap. II Sección 2.ª). Son de distinta categoría y protección."},
+  {b:"G. EAC — derechos y principios",q:"Los derechos reconocidos en el EAC se rigen por el principio de:",opts:["aplicación directa sin necesidad de ley de desarrollo en todos los casos","interpretación restrictiva respecto a los derechos de la CE","interpretación y aplicación en el sentido más favorable a su plena efectividad","prelación sobre los derechos de la CE en territorio catalán"],c:2,f:"El EAC establece que sus derechos se interpretan y aplican en el sentido más favorable a su plena efectividad. No prevalecen sobre la CE ni se aplican siempre directamente sin ley."},
+  {b:"G. EAC — derechos y principios",q:"El Consell de Garanties Estatutàries:",opts:["es el equivalente al Tribunal Constitucional en Cataluña","forma parte de la Generalitat y dictamina sobre adecuación al EAC y a la CE","es un órgano del Govern sin independencia funcional","es la denominación catalana del Síndic de Greuges"],c:1,f:"El Consell de Garanties Estatutàries es un órgano consultivo que dictamina sobre la adecuación al EAC y a la CE de los proyectos y proposiciones de ley. Forma parte de la Generalitat pero no es el TC ni el Síndic."},
+  {b:"G. EAC — derechos y principios",q:"La Sindicatura de Comptes es:",opts:["el equivalente catalán del Defensor del Pueblo","el órgano de control externo de la actividad económica y presupuestaria de la Generalitat","un órgano interno de auditoría del Govern","el tribunal que resuelve conflictos entre el Parlament y el Govern"],c:1,f:"La Sindicatura de Comptes es el órgano fiscalizador externo de la actividad económica, financiera y contable de la Generalitat y del sector público catalán. Distinto del Síndic de Greuges (defensor del pueblo catalán)."},
+  {b:"G. EAC — derechos y principios",q:"¿En qué se diferencia el Síndic de Greuges de la Sindicatura de Comptes?",opts:["son el mismo órgano con distinto nombre","el Síndic defiende derechos de los ciudadanos frente a la Administración; la Sindicatura fiscaliza la actividad económica y presupuestaria","el Síndic controla las cuentas públicas; la Sindicatura atiende quejas ciudadanas","ambos controlan el gasto público pero desde perspectivas distintas"],c:1,f:"Síndic de Greuges = defensor del pueblo catalán (derechos ciudadanos). Sindicatura de Comptes = fiscalización económica y presupuestaria externa. Son órganos distintos con funciones completamente diferentes."},
+  {b:"G. EAC — derechos y principios",q:"Los principios rectores del EAC:",opts:["tienen el mismo rango que los derechos del EAC","son directamente invocables sin necesidad de desarrollo legislativo","orientan las políticas públicas de la Generalitat e informan la legislación","prevalecen sobre los principios rectores de la CE"],c:2,f:"Los principios rectores del EAC orientan las políticas públicas y actúan como criterios de interpretación de la legislación, pero no son directamente justiciables sin ley de desarrollo. Misma lógica que el Cap. III de la CE."},
+  {b:"H. Competencias — casos prácticos",q:"La Generalitat tiene competencia exclusiva en materia de derecho civil catalán. Esto significa que:",opts:["el Estado puede dictar las bases que enmarcan esa materia","la Generalitat legisla, reglamenta y ejecuta sin que el Estado pueda intervenir en esa materia","la Generalitat solo ejecuta la normativa estatal sobre derecho civil","es una competencia compartida de facto porque el Estado tiene el derecho civil común"],c:1,f:"Competencia exclusiva = la Generalitat tiene la potestad legislativa, reglamentaria y ejecutiva de forma íntegra en esa materia. El Estado no puede entrar a regularla con bases (eso sería compartida)."},
+  {b:"H. Competencias — casos prácticos",q:"Si el Estado dicta una ley básica de procedimiento administrativo que todas las CC.AA. deben respetar, estamos ante una competencia:",opts:["exclusiva de la Generalitat","exclusiva del Estado","compartida, con bases del Estado","ejecutiva de la Generalitat"],c:2,f:"Procedimiento administrativo común = Estado fija las bases (Ley 39/2015) + CC.AA. pueden desarrollar y ejecutar dentro de ese marco. Es el modelo tipo de competencia compartida."},
+  {b:"H. Competencias — casos prácticos",q:"En una competencia ejecutiva, la Generalitat puede:",opts:["legislar en la materia sin límite","dictar las bases que enmarcan la actuación del Estado","ejecutar y organizar la Administración, pero no legislar","compartir la potestad legislativa con el Estado"],c:2,f:"Competencia ejecutiva = solo ejecución y organización administrativa de la normativa estatal. Sin potestad legislativa propia. La normativa la dicta el Estado íntegramente."},
+  {b:"H. Competencias — casos prácticos",q:"El art. 111 EAC regula las competencias:",opts:["exclusivas","compartidas","ejecutivas","fiscales"],c:1,f:"Trío imprescindible: art. 110 = exclusivas, art. 111 = compartidas, art. 112 = ejecutivas. Si en el test aparece 'art. 111', la respuesta es siempre compartidas."},
+  {b:"I. Presidència i Govern — detalle",q:"El president/a de la Generalitat puede disolver el Parlament:",opts:["nunca, solo el Estado puede hacerlo","en cualquier momento sin limitación","con decreto motivado, salvo en los supuestos legalmente prohibidos","solo con autorización del Govern por mayoría absoluta"],c:2,f:"El president/a puede disolver el Parlament mediante decreto motivado, pero hay supuestos prohibidos: no puede hacerlo si hay moción de censura en trámite, en el primer período de sesiones, ni si ya se disolvió anticipadamente en la legislatura anterior."},
+  {b:"I. Presidència i Govern — detalle",q:"Los decretos ley del Govern se diferencian de los decretos legislativos en que:",opts:["los decretos ley requieren delegación previa del Parlament; los decretos legislativos no","los decretos legislativos son de urgencia y extraordinaria necesidad; los decretos ley son de delegación","los decretos ley se dictan en situaciones de urgencia y extraordinaria necesidad sin delegación previa; los decretos legislativos requieren delegación del Parlament","son exactamente lo mismo con distinto nombre"],c:2,f:"Decreto ley = urgencia y necesidad extraordinaria, sin delegación previa. Decreto legislativo = el Parlament delega expresamente al Govern para refundir, regular o articular una materia concreta. Son figuras distintas."},
+  {b:"I. Presidència i Govern — detalle",q:"La moción de censura en el sistema parlamentario catalán es:",opts:["constructiva, es decir, debe incluir un candidato alternativo","destructiva, solo exige retirar la confianza al Govern","opcional, el Govern puede ignorarla si tiene mayoría","inexistente, en Cataluña solo existe la cuestión de confianza"],c:0,f:"La moción de censura en el sistema catalán (como en el estatal) es constructiva: debe proponer al mismo tiempo un candidato alternativo a president/a. Sin candidato alternativo no puede prosperar."},
+  {b:"I. Presidència i Govern — detalle",q:"La cuestión de confianza la plantea:",opts:["el Parlament al Govern para exigirle rendición de cuentas","el president/a al Parlament para verificar que sigue teniendo su confianza","cualquier grupo parlamentario con 1/5 de los diputados","el Govern en pleno por mayoría de 2/3"],c:1,f:"La cuestión de confianza es una iniciativa del president/a: la plantea ante el Parlament para que este se pronuncie si sigue confiando en él. Si pierde, debe presentar la dimisión."},
+  {b:"J. Trampas cruzadas",q:"Si una pregunta menciona 'declaración de estado de alarma' y pregunta si puede iniciarse la reforma constitucional, la respuesta es:",opts:["sí, si la mayoría parlamentaria es suficiente","no, el art. 169 CE lo prohíbe expresamente","sí, si el TC lo autoriza","depende del tipo de reforma: ordinaria sí, agravada no"],c:1,f:"Art. 169 CE: durante los estados de alarma, excepción o sitio (art. 116 CE) no puede iniciarse la reforma constitucional. La prohibición es absoluta, no depende del tipo de procedimiento ni de mayorías."},
+  {b:"J. Trampas cruzadas",q:"¿Cuál de estas afirmaciones es correcta?",opts:["el Síndic de Greuges puede anular actos administrativos","la Sindicatura de Comptes puede sancionar al Govern por mal gasto","el Consell de Garanties Estatutàries puede declarar inconstitucional una ley","ninguna de las anteriores: cada órgano tiene funciones distintas y ninguno puede hacer lo que se describe"],c:3,f:"El Síndic solo recomienda, no anula. La Sindicatura fiscaliza pero no sanciona directamente. El Consell de Garanties dictamina pero no declara inconstitucionalidad (eso es el TC). Ninguna de las tres afirmaciones es correcta."},
+  {b:"J. Trampas cruzadas",q:"Mezclar 'reforma del art. 167 CE' con 'revisión total o parcial del Título Preliminar' es:",opts:["correcto si el Parlament lo autoriza","un error: el Título Preliminar siempre requiere el art. 168","aceptable en doctrina minoritaria","correcto si hay consenso de 4/5 de las Cámaras"],c:1,f:"El Título Preliminar está blindado por el art. 168 CE (procedimiento agravado). Nunca puede reformarse por el procedimiento ordinario del art. 167, independientemente de consensos o autorizaciones."},
+  {b:"J. Trampas cruzadas",q:"Si una pregunta combina 'comunicación previa', 'manifestaciones' y 'art. 21 CE', la respuesta correcta casi siempre gira en torno a:",opts:["que se necesita autorización judicial previa","que basta comunicación previa, sin autorización","que se requiere licencia municipal","que el derecho puede ejercerse sin ningún requisito en todo caso"],c:1,f:"Art. 21 CE: las reuniones en lugares de tránsito público y las manifestaciones requieren comunicación previa a la autoridad, no autorización. Sin comunicación la autoridad puede prohibirlas por razones fundadas de orden público."},
+  {b:"J. Trampas cruzadas",q:"¿Cuál es la diferencia clave entre 'derechos del EAC' y 'principios rectores del EAC'?",opts:["son idénticos en cuanto a protección y aplicabilidad","los derechos son directamente alegables; los principios rectores informan las políticas pero requieren desarrollo para ser exigibles","los principios tienen más protección que los derechos del EAC","los derechos del EAC prevalecen sobre los de la CE"],c:1,f:"Misma lógica que en la CE: los derechos del EAC tienen eficacia jurídica propia; los principios rectores orientan pero necesitan desarrollo legislativo para ser plenamente exigibles. No prevalecen sobre la CE en ningún caso."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx],total=pool.length;
+  document.getElementById('fill').style.width=Math.round((idx/total)*100)+'%';
+  document.getElementById('prog-num').textContent=(idx+1)+' / '+total;
+  document.getElementById('v-ok').textContent=nOk;
+  document.getElementById('v-err').textContent=nErr;
+  document.getElementById('v-pend').textContent=total-idx;
+  document.getElementById('pill').textContent=q.b;
+  document.getElementById('q-num-lbl').textContent='Pregunta '+(idx+1);
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML='<span class="letter">'+l+'</span><span>'+q.opts[i]+'</span>';
+    btn.onclick=()=>select(i,btn);
+    opts.appendChild(btn);
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='';fb.innerHTML='';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+}
+
+function select(i,btn){
+  if(answered)return;
+  answered=true;
+  const q=pool[idx];
+  document.querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));
+  const fb=document.getElementById('feedback');
+  if(i===q.c){
+    btn.classList.add('correct');nOk++;
+    fb.className='show ok';
+    fb.innerHTML='<div class="fb-head">Correcto</div><div class="fb-body">'+q.f+'</div>';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt')[q.c].classList.add('correct');
+    nErr++;
+    fallos.push({q:q.q,correcta:q.opts[q.c],tuResp:q.opts[i],f:q.f});
+    fb.className='show err';
+    fb.innerHTML='<div class="fb-head">Incorrecto — correcta: '+['A','B','C','D'][q.c]+'</div><div class="fb-body">'+q.f+'</div>';
+  }
+  document.getElementById('v-ok').textContent=nOk;
+  document.getElementById('v-err').textContent=nErr;
+  document.getElementById('btn-next').style.display='inline-block';
+}
+
+function nextQ(){idx++;render();}
+
+function showResults(){
+  ['header','progress-wrap','stats-row','q-card','options','feedback','btn-row'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  const total=pool.length,pct=Math.round((nOk/total)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  document.getElementById('res-title').textContent=
+    pct>=80?'T1 consolidado':pct>=60?'Buen avance — repasa los fallos':'Refuerza antes de pasar al T5';
+  document.getElementById('res-sub').textContent=
+    nOk+' correctas de '+total+'.'+(fallos.length>0?' '+fallos.length+' preguntas para repasar.':' Sin errores.');
+  if(!fallos.length)document.getElementById('btn-fallos').style.display='none';
+  if(fallos.length){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent='Preguntas falladas ('+fallos.length+')';
+    const fl=document.getElementById('fallos-list');fl.innerHTML='';
+    fallos.forEach(f=>{
+      const d=document.createElement('div');d.className='fallo';
+      d.innerHTML='<div class="fallo-q">'+f.q+'</div>'
+        +'<div class="fallo-badges"><span class="badge err">Tu respuesta: '+f.tuResp+'</span><span class="badge ok">Correcta: '+f.correcta+'</span></div>'
+        +'<div class="fallo-exp">'+f.f+'</div>';
+      fl.appendChild(d);
+    });
+  }
+  document.getElementById('results').style.display='block';
+}
+
+function restart(){
+  pool=[...ALL_Q];idx=0;nOk=0;nErr=0;fallos=[];
+  document.getElementById('results').style.display='none';
+  ['header','progress-wrap','stats-row','q-card','options','btn-row'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='';
+  });
+  document.getElementById('stats-row').style.display='grid';
+  render();
+}
+
+function soloFallos(){
+  if(!fallos.length)return;
+  pool=fallos.map(f=>ALL_Q.find(q=>q.q===f.q)).filter(Boolean);
+  idx=0;nOk=0;nErr=0;fallos=[];
+  document.getElementById('results').style.display='none';
+  ['header','progress-wrap','stats-row','q-card','options','btn-row'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='';
+  });
+  document.getElementById('stats-row').style.display='grid';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

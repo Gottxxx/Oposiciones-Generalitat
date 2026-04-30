@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 5 · Test 3 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg:#f8f7f4;--surface:#ffffff;--surface2:#f1f0ed;--border:rgba(0,0,0,0.1);--border-strong:rgba(0,0,0,0.2);--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--ok:#1a7a4a;--ok-bg:#eaf5ee;--ok-border:rgba(26,122,74,0.25);--err:#c0392b;--err-bg:#fdf0ee;--err-border:rgba(192,57,43,0.25);--accent:#1a1a18;--radius:10px;--radius-sm:6px; }
+  @media(prefers-color-scheme:dark){:root{--bg:#18181a;--surface:#222224;--surface2:#2a2a2c;--border:rgba(255,255,255,0.1);--border-strong:rgba(255,255,255,0.2);--text:#f0efec;--text2:#a0a09a;--text3:#606060;--ok:#4caf7a;--ok-bg:rgba(76,175,122,0.12);--ok-border:rgba(76,175,122,0.3);--err:#e57373;--err-bg:rgba(229,115,115,0.12);--err-border:rgba(229,115,115,0.3);--accent:#f0efec;}}
+  html{font-size:16px;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 4rem;}
+  #app{width:100%;max-width:680px;}
+  #header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:2rem;}
+  #header h1{font-size:17px;font-weight:600;color:var(--text);margin-bottom:3px;letter-spacing:-0.01em;}
+  #header p{font-size:13px;color:var(--text3);}
+  #pill{font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border-strong);color:var(--text2);background:var(--surface2);white-space:nowrap;flex-shrink:0;}
+  #progress-wrap{margin-bottom:1.25rem;}
+  #progress-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:7px;}
+  #progress-row span:last-child{font-weight:500;color:var(--text2);}
+  #track{height:3px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+  #fill{height:3px;background:var(--accent);border-radius:3px;transition:width 0.4s ease;width:0%;}
+  #stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem;}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+  .stat .lbl{font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;}
+  .stat .val{font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.02em;}
+  #sc-ok .val{color:var(--ok);}#sc-err .val{color:var(--err);}
+  #q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;}
+  #q-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.04em;}
+  #q-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--border-strong);display:inline-block;}
+  #q-text{font-size:16px;color:var(--text);line-height:1.65;}
+  #options{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+  .opt{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 16px;font-size:14px;color:var(--text);cursor:pointer;text-align:left;line-height:1.55;transition:border-color 0.15s,background 0.15s,transform 0.1s;width:100%;}
+  .opt:hover:not(.disabled){border-color:var(--border-strong);background:var(--surface2);transform:translateY(-1px);}
+  .letter{min-width:24px;height:24px;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0;margin-top:1px;transition:background 0.15s,color 0.15s,border-color 0.15s;}
+  .opt.correct{border-color:var(--ok-border);background:var(--ok-bg);}
+  .opt.correct .letter{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .opt.wrong{border-color:var(--err-border);background:var(--err-bg);}
+  .opt.wrong .letter{background:var(--err);border-color:var(--err);color:#fff;}
+  .opt.disabled{cursor:default;pointer-events:none;}
+  #feedback{display:none;border-radius:var(--radius-sm);padding:13px 16px;margin-bottom:1rem;border:1px solid;font-size:13px;line-height:1.65;}
+  #feedback.show{display:block;}
+  #feedback.ok{background:var(--ok-bg);border-color:var(--ok-border);}
+  #feedback.err{background:var(--err-bg);border-color:var(--err-border);}
+  #feedback .fb-head{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:5px;}
+  #feedback.ok .fb-head{color:var(--ok);}#feedback.err .fb-head{color:var(--err);}
+  #feedback .fb-body{color:var(--text2);}
+  #btn-row{display:flex;justify-content:flex-end;}
+  #btn-next{display:none;font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius-sm);background:var(--accent);color:var(--bg);border:none;cursor:pointer;transition:opacity 0.15s;}
+  #btn-next:hover{opacity:0.85;}
+  #results{display:none;padding:1rem 0;}
+  #res-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:2rem;}
+  #res-pct{font-size:64px;font-weight:700;color:var(--text);letter-spacing:-0.04em;line-height:1;flex-shrink:0;}
+  #res-info h2{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  #res-info p{font-size:13px;color:var(--text2);line-height:1.6;}
+  #res-btns{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap;}
+  .btn-sec{font-size:13px;font-weight:500;padding:10px 18px;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:var(--surface);color:var(--text);cursor:pointer;transition:background 0.15s;}
+  .btn-sec:hover{background:var(--surface2);}
+  .btn-prim{background:var(--accent);color:var(--bg);border-color:transparent;}
+  .btn-prim:hover{opacity:0.85;background:var(--accent);}
+  #fallos-section{border-top:1px solid var(--border);padding-top:1.5rem;}
+  #fallos-section h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.04em;}
+  .fallo{padding:1rem 0;border-bottom:1px solid var(--border);}
+  .fallo:last-child{border-bottom:none;}
+  .fallo-q{font-size:14px;color:var(--text);margin-bottom:8px;line-height:1.5;font-weight:500;}
+  .fallo-badges{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+  .badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid;}
+  .badge.err{background:var(--err-bg);border-color:var(--err-border);color:var(--err);}
+  .badge.ok{background:var(--ok-bg);border-color:var(--ok-border);color:var(--ok);}
+  .fallo-exp{font-size:12px;color:var(--text3);line-height:1.6;}
+  @media(max-width:500px){body{padding:1rem 0.75rem 3rem;}#res-hero{flex-direction:column;gap:1rem;align-items:flex-start;}#res-pct{font-size:48px;}#header{flex-direction:column;gap:0.75rem;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <h1>Tema 5 · Test 3 · Oposición Generalitat</h1>
+      <p>45 preguntas · Simulacro final con trampas cruzadas</p>
+    </div>
+    <div id="pill"></div>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-row"><span>Progreso</span><span id="prog-num">1 / 45</span></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">45</div></div>
+  </div>
+  <div id="q-card">
+    <div id="q-meta"><span id="q-num-lbl"></span><span class="dot"></span><span id="q-bloque-lbl"></span></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info"><h2 id="res-title"></h2><p id="res-sub"></p></div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+</div>
+<script>
+const ALL_Q=[
+  {b:"A. Procedimiento — repaso conceptual",q:"La simplificación y racionalidad administrativa buscan:",opts:["Eliminar toda formalidad legal","Reducir trámites inútiles y mejorar el procedimiento","Sustituir siempre la notificación por la publicación","Convertir todos los plazos en naturales"],c:1,f:"Simplificación y racionalidad = menos trámites inútiles, procedimientos más ágiles sin perder garantías. No elimina formalidades necesarias — las depura."},
+  {b:"A. Procedimiento — repaso conceptual",q:"El principio que ordena la relación entre normas de distinto rango es:",opts:["Publicidad normativa","Jerarquía normativa","Irretroactividad","Seguridad jurídica"],c:1,f:"Jerarquía normativa = las normas de rango superior prevalecen sobre las de rango inferior. Es un principio del art. 9.3 CE que también impregna la actuación administrativa. No confundir con los principios del procedimiento del T5."},
+  {b:"A. Procedimiento — repaso conceptual",q:"¿Cuál NO es un principio del procedimiento administrativo según el T5?",opts:["Buena fe y confianza legítima","Proporcionalidad","Jerarquía orgánica interna","Transparencia y accesibilidad"],c:2,f:"Jerarquía orgánica interna no es un principio del procedimiento administrativo — es un principio de organización. Los principios del procedimiento son: legalidad, eficacia, objetividad, buena fe, proporcionalidad, simplificación y transparencia."},
+  {b:"B. Interesados — supuestos prácticos",q:"Una asociación de vecinos sin personalidad jurídica propia puede ser interesada en un procedimiento:",opts:["Nunca, solo personas con personalidad jurídica plena","Sí, si la ley lo prevé para defender sus intereses colectivos","Solo si tienen CIF propio","Solo en procedimientos urbanísticos"],c:1,f:"Grupos de afectados y entidades sin personalidad pueden tener capacidad de obrar si la ley lo prevé. No es una regla automática — depende del ámbito y del reconocimiento normativo."},
+  {b:"B. Interesados — supuestos prácticos",q:"Un menor de 14 años quiere impugnar una sanción que le afecta directamente. ¿Puede actuar por sí solo?",opts:["No, siempre necesita representante legal","Sí, si el ordenamiento se lo permite para defender sus derechos e intereses","Solo si el juez lo autoriza previamente","Solo a partir de los 12 años con asistencia letrada"],c:1,f:"Los menores pueden actuar cuando el ordenamiento jurídico se lo permita para defender sus derechos. No es una regla de edad fija — depende de lo que establezca la normativa aplicable en cada caso."},
+  {b:"B. Interesados — supuestos prácticos",q:"Un interesado presenta una solicitud con un error en el domicilio de notificación. La Administración debe:",opts:["Denegar la solicitud por defecto formal","Requerir al interesado para que subsane el defecto en 10 días","Tramitar igualmente sin avisar al interesado","Archivar el expediente por falta de datos correctos"],c:1,f:"Cualquier defecto subsanable en la solicitud — incluido el domicilio — debe ser objeto de requerimiento de subsanación en 10 días (ampliables hasta 5 más). No es causa de denegación directa."},
+  {b:"C. Plazos — simulacro de cálculo",q:"Un acto se notifica un miércoles. El plazo para recurrir en alzada es de 1 mes. ¿Desde qué día corre el plazo?",opts:["Desde el mismo miércoles de la notificación","Desde el jueves siguiente a la notificación","Desde el lunes siguiente","Desde el primer día hábil del mes siguiente"],c:1,f:"Los plazos corren desde el día siguiente a la notificación. Si la notificación es un miércoles, el plazo empieza el jueves. Regla básica pero el examen la pone como trampa con 'desde el mismo día'."},
+  {b:"C. Plazos — simulacro de cálculo",q:"El último día de un plazo cae en sábado. El plazo vence:",opts:["El viernes anterior","El sábado mismo","El lunes siguiente","El primer día hábil de la semana siguiente"],c:3,f:"Si el último día es inhábil (sábado, domingo o festivo), el plazo se prorroga al primer día hábil siguiente. El lunes siguiente es la respuesta correcta si no hay festivo el lunes."},
+  {b:"C. Plazos — simulacro de cálculo",q:"Un plazo de 3 meses empieza el 30 de noviembre. ¿Cuándo vence?",opts:["El 28 de febrero","El 29 de febrero si es bisiesto, o el 28 si no","El 30 de noviembre del año siguiente","El 28 o 29 de febrero, último día del mes"],c:3,f:"3 meses desde el 30 de noviembre = 28 o 29 de febrero (según sea bisiesto o no), porque febrero no tiene día 30. Regla: si el mes de vencimiento no tiene día equivalente, vence el último día del mes."},
+  {b:"D. Actos — eficacia y ejecutividad",q:"Un acto con eficacia diferida produce efectos:",opts:["Desde que lo firma el órgano que lo dicta","Desde la fecha que el propio acto señale o desde que se cumpla la condición establecida","Desde que se notifica siempre, sin excepción posible","Desde que el interesado lo acepta expresamente"],c:1,f:"La eficacia puede diferirse: el acto puede señalar una fecha futura de efectos o condicionarlos al cumplimiento de una condición. La regla general es la eficacia desde la notificación, pero caben excepciones establecidas en el propio acto."},
+  {b:"D. Actos — eficacia y ejecutividad",q:"La ejecutoriedad forzosa de los actos administrativos significa que:",opts:["Solo los jueces pueden ejecutar los actos administrativos","La Administración puede compeler al cumplimiento por sus propios medios, sin necesidad de acudir a los tribunales","El acto es válido sin necesidad de notificación","El acto se ejecuta antes de notificarse al interesado"],c:1,f:"Ejecutoriedad = la Administración puede ejecutar forzosamente sus actos por sus propios medios (apremio, ejecución subsidiaria, multa coercitiva, compulsión). No necesita acudir al juez para ejecutar sus propias decisiones."},
+  {b:"D. Actos — eficacia y ejecutividad",q:"Los medios de ejecución forzosa de los actos administrativos son:",opts:["Solo el apremio sobre el patrimonio","Apremio sobre el patrimonio, ejecución subsidiaria, multa coercitiva y compulsión sobre las personas","Solo la multa coercitiva","Solo la compulsión directa sobre la persona"],c:1,f:"Cuatro medios de ejecución forzosa: apremio sobre el patrimonio + ejecución subsidiaria + multa coercitiva + compulsión sobre las personas. Los cuatro en orden de menor a mayor intensidad coactiva."},
+  {b:"D. Actos — eficacia y ejecutividad",q:"La multa coercitiva se diferencia de la sanción administrativa en que:",opts:["Son idénticas en sus efectos","La multa coercitiva es reiterada para vencer la resistencia del interesado; la sanción castiga una infracción ya cometida","La sanción puede reiterarse; la multa coercitiva no","Solo la sanción requiere procedimiento previo"],c:1,f:"Multa coercitiva = instrumento para vencer la resistencia del obligado, reiterada hasta que cumple. Sanción = castigo por infracción ya cometida, no reiterada por la misma conducta. Son figuras distintas con finalidades distintas."},
+  {b:"E. Silencio — repaso y matices",q:"El silencio positivo en una solicitud de subvención pública:",opts:["Siempre se produce por ser solicitud del interesado","No se produce si una ley establece el silencio negativo para ese tipo de solicitudes","Se produce automáticamente a los 3 meses sin excepción","Solo se produce si el interesado lo reclama expresamente"],c:1,f:"Las subvenciones y ayudas públicas son uno de los supuestos donde las leyes sectoriales suelen establecer silencio negativo, por razones de interés público y control del gasto. La regla general (silencio positivo) cede ante la ley sectorial."},
+  {b:"E. Silencio — repaso y matices",q:"¿Puede el silencio positivo adquirirse si el solicitante no tenía derecho a lo solicitado?",opts:["Sí, el silencio positivo opera automáticamente sin control de fondo","No: el silencio positivo no puede adquirirse en contra del ordenamiento jurídico o en contra del interés general","Sí, pero la Administración puede revisarlo en 6 meses","No, pero solo si hay terceros perjudicados"],c:1,f:"El silencio positivo no puede adquirir lo que el ordenamiento prohíbe. Si el solicitante no tenía derecho a lo pedido (por ejemplo, pide una licencia en suelo no edificable), el silencio positivo no le confiere ese derecho — sería nulo de pleno derecho."},
+  {b:"E. Silencio — repaso y matices",q:"Ante el silencio negativo, el interesado:",opts:["Debe esperar obligatoriamente a la resolución expresa","Puede interponer recurso como si hubiera denegación expresa, pero la Administración sigue obligada a resolver","Pierde el derecho si no recurre en 1 mes","Puede exigir responsabilidad penal directamente"],c:1,f:"Silencio negativo = ficción legal que habilita el recurso, pero no extingue la obligación de resolver. La Administración sigue obligada a dictar resolución expresa aunque el interesado haya recurrido."},
+  {b:"F. Invalidez — revisión y lesividad",q:"La declaración de lesividad procede para:",opts:["Actos nulos de pleno derecho","Actos anulables favorables al interesado que la Administración quiere impugnar ante la jurisdicción contencioso-administrativa","Cualquier acto que la Administración quiera retirar","Actos nulos si han transcurrido más de 4 años"],c:1,f:"Lesividad: cuando la Administración quiere impugnar ante los tribunales un acto anulable que le es perjudicial pero que es favorable al interesado. Plazo: 4 años desde el acto. Después de declararlo lesivo, la Administración acude al contencioso."},
+  {b:"F. Invalidez — revisión y lesividad",q:"El plazo para declarar la lesividad de un acto anulable es:",opts:["1 año","2 años","4 años","Sin plazo"],c:2,f:"Lesividad: 4 años desde que se dictó el acto. Transcurrido ese plazo, la Administración ya no puede declarar lesivo el acto anulable. Distinto de la revisión de oficio de actos nulos, que no tiene plazo."},
+  {b:"F. Invalidez — revisión y lesividad",q:"La convalidación de un acto anulable por falta de motivación:",opts:["No es posible: la falta de motivación produce nulidad","Es posible añadiendo la motivación que faltaba","Requiere un nuevo procedimiento completo","Solo es posible si el interesado lo consiente"],c:1,f:"La falta de motivación produce anulabilidad (no nulidad) y puede convalidarse añadiendo la motivación que faltaba. La convalidación tiene efectos desde la fecha del acto original, salvo que afecte a terceros."},
+  {b:"F. Invalidez — revisión y lesividad",q:"Un acto constitutivo de infracción penal es:",opts:["Anulable con plazo de 1 mes","Nulo de pleno derecho","Irregular pero ejecutivo","Válido si la infracción penal se condena por separado"],c:1,f:"Acto constitutivo de delito o falta penal = nulidad de pleno derecho. Es una de las causas tasadas del art. 47. El hecho de que la vía penal siga su curso por separado no convalida el acto administrativo."},
+  {b:"G. Notificación — supuestos especiales",q:"Cuando hay varios interesados con el mismo domicilio desconocido:",opts:["Se notifica a uno solo como representante tácito de los demás","Se publica el acto en el BOE y en el Boletín Oficial de la comunidad autónoma correspondiente","Se notifica al Colegio de Abogados para que los localice","Se archiva el expediente hasta que los interesados se personan"],c:1,f:"Cuando el domicilio es desconocido o la notificación personal ha sido intentada sin efecto, se acude a la publicación en el Boletín Oficial que corresponda. En algunos casos puede ser necesaria la publicación en el BOE y en el boletín autonómico simultáneamente."},
+  {b:"G. Notificación — supuestos especiales",q:"La notificación mediante comparecencia en la sede electrónica:",opts:["Solo vale para personas jurídicas","Consiste en que el interesado accede voluntariamente a consultar el acto en la sede electrónica","Es obligatoria para todos los interesados desde 2016","Solo procede cuando hay 10 o más interesados afectados"],c:1,f:"La notificación por comparecencia en sede electrónica es una modalidad en la que el interesado accede voluntariamente al espacio personal en la sede electrónica. Se usa como alternativa cuando la notificación postal ha fallado."},
+  {b:"G. Notificación — supuestos especiales",q:"La publicación en el Boletín Oficial sustituye a la notificación. En ese caso, el plazo de recurso empieza:",opts:["Desde que se publica","Desde el día siguiente a la publicación","Desde que el interesado tiene conocimiento efectivo, siempre","Desde el día en que el Boletín se imprime"],c:1,f:"El plazo de recurso contra un acto publicado en el Boletín Oficial corre desde el día siguiente a la publicación, igual que con la notificación personal. El dies a quo es el día siguiente, no el mismo día de publicación."},
+  {b:"H. Recursos — supuestos prácticos",q:"El recurso de alzada se interpone ante:",opts:["El mismo órgano que dictó el acto","El órgano superior jerárquico del que dictó el acto","El Tribunal Superior de Justicia directamente","El Defensor del Pueblo"],c:1,f:"Alzada = ante el superior jerárquico del órgano que dictó el acto. Si el acto lo dictó el director general, la alzada va al secretario de Estado o ministro. Si no hay superior jerárquico, el acto ya pone fin a la vía administrativa."},
+  {b:"H. Recursos — supuestos prácticos",q:"Si se desestima el recurso de alzada, el acto:",opts:["Puede impugnarse con un nuevo recurso de alzada ante un órgano superior","Pone fin a la vía administrativa y puede impugnarse en vía contencioso-administrativa","Puede impugnarse con recurso de reposición potestativo","Es firme y ya no puede impugnarse en ninguna vía"],c:1,f:"La desestimación de la alzada agota la vía administrativa. A partir de ahí, solo queda la vía contencioso-administrativa. No cabe otra alzada ni reposición posterior al agotamiento de la vía administrativa."},
+  {b:"H. Recursos — supuestos prácticos",q:"El recurso de reposición, si se desestima, deja abierta:",opts:["La posibilidad de interponer recurso de alzada","La posibilidad de acudir a la vía contencioso-administrativa","La posibilidad de interponer un segundo recurso de reposición","Ninguna vía: el acto es firme"],c:1,f:"Si el acto pone fin a la vía administrativa y se interpone reposición potestativo, la desestimación (expresa o por silencio) deja abierta la vía contencioso-administrativa. No cabe alzada porque el acto ya agotaba la vía administrativa."},
+  {b:"I. Trampas de plazos cruzados",q:"¿Cuál es el plazo correcto para el recurso de alzada contra silencio?",opts:["1 mes","2 meses","3 meses","6 meses"],c:2,f:"Alzada contra silencio = 3 meses. Alzada contra acto expreso = 1 mes. Reposición contra silencio = 3 meses. Reposición contra acto expreso = 1 mes. Contencioso contra silencio = 6 meses. Contencioso contra acto expreso = 2 meses."},
+  {b:"I. Trampas de plazos cruzados",q:"¿Cuál de estas combinaciones de plazos es CORRECTA?",opts:["Alzada acto expreso: 2 meses / Contencioso acto expreso: 1 mes","Alzada acto expreso: 1 mes / Contencioso acto expreso: 2 meses","Alzada silencio: 1 mes / Contencioso silencio: 3 meses","Reposición acto expreso: 2 meses / Alzada acto expreso: 1 mes"],c:1,f:"Tabla correcta: alzada acto expreso = 1 mes / reposición acto expreso = 1 mes / contencioso acto expreso = 2 meses / alzada silencio = 3 meses / reposición silencio = 3 meses / contencioso silencio = 6 meses."},
+  {b:"I. Trampas de plazos cruzados",q:"El plazo de 10 días para notificar el acto y el plazo de 3 meses para resolver son:",opts:["El mismo plazo con distinto nombre","Plazos distintos: 3 meses para resolver desde la solicitud; 10 días para notificar desde que se dicta el acto","Ambos plazos para notificar, según el tipo de procedimiento","El plazo de 10 días sustituye al de 3 meses cuando el acto es favorable"],c:1,f:"Son plazos completamente distintos: 3 meses = plazo máximo para resolver el procedimiento desde la solicitud. 10 días = plazo para practicar la notificación una vez que el acto ya ha sido dictado. El examen los mezcla sistemáticamente."},
+  {b:"I. Trampas de plazos cruzados",q:"El plazo de audiencia (10-15 días) y el plazo de subsanación (10 días) son:",opts:["El mismo plazo aplicado en distintos momentos","Plazos distintos: la audiencia es antes de la resolución; la subsanación es al inicio cuando hay defectos en la solicitud","Ambos plazos de 15 días en realidad","Intercambiables según el tipo de procedimiento"],c:1,f:"Audiencia (10-15 días) = trámite antes de la resolución para que el interesado alegue. Subsanación (10 días, ampliables a 5 más) = requerimiento al inicio cuando la solicitud tiene defectos formales. Son momentos y funciones distintas del procedimiento."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"¿Cuál de estas afirmaciones sobre el silencio administrativo es INCORRECTA?",opts:["El silencio positivo se produce como regla general en solicitudes del interesado","El silencio negativo requiere previsión legal o razones de interés general","La Administración queda liberada de resolver una vez producido el silencio","El silencio no extingue la obligación de resolver de la Administración"],c:2,f:"La afirmación incorrecta es la C. La Administración NUNCA queda liberada de resolver, aunque se haya producido el silencio. Sigue obligada a dictar resolución expresa. El silencio solo habilita al interesado para recurrir sin esperar."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"Un acto nulo de pleno derecho y un acto anulable se diferencian fundamentalmente en que:",opts:["El nulo no produce efectos desde el inicio; el anulable produce efectos hasta que se anula","Solo el nulo puede revisarse de oficio sin plazo; el anulable tiene plazo y requiere lesividad si es favorable","Solo el anulable puede impugnarse; el nulo no admite recurso","Son idénticos en la práctica salvo el nombre"],c:1,f:"La diferencia estructural: el nulo puede revisarse de oficio en cualquier momento sin plazo. El anulable, si es favorable al interesado, requiere declaración de lesividad en 4 años. Si es desfavorable, debe impugnarse en plazo de recurso."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"La caducidad de un procedimiento sancionador NO impide:",opts:["Que se archive el expediente caducado","Iniciar un nuevo procedimiento si la infracción no ha prescrito","Que la Administración deba resolver en el procedimiento caducado","Nada: la caducidad es definitiva en todos los casos"],c:1,f:"La caducidad archiva el expediente concreto, pero no prescribe la infracción. Si el plazo de prescripción de la infracción no ha transcurrido, la Administración puede iniciar un nuevo procedimiento. La caducidad y la prescripción son instituciones distintas."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"Un interesado desiste de su solicitud de licencia. La Administración:",opts:["Debe archivar siempre sin excepción","Puede continuar el procedimiento de oficio si hay interés público","Debe imponer una sanción por el desistimiento","Debe declarar la caducidad del procedimiento"],c:1,f:"El desistimiento del interesado no obliga a archivar si hay interés público en continuar el procedimiento. La Administración puede seguir de oficio. Esto ocurre especialmente en procedimientos que afectan a intereses colectivos o de terceros."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"¿Cuál de estos actos requiere motivación obligatoria?",opts:["Toda resolución favorable al interesado sin excepción","Un acto que se separa del criterio seguido en actuaciones anteriores similares","Un acto que concede exactamente lo solicitado sin restricciones","Un acto de trámite sin efectos para el interesado"],c:1,f:"La motivación es obligatoria, entre otros casos, cuando el acto se separa del criterio o precedente seguido en actuaciones similares anteriores. Es una de las causas más preguntadas en test porque protege la seguridad jurídica y la igualdad de trato."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"La interposición de un recurso contencioso-administrativo:",opts:["Suspende automáticamente el acto impugnado","No suspende automáticamente el acto; la suspensión debe pedirse y acordarse expresamente por el tribunal","Suspende el acto si el recurso es admitido a trámite","Suspende el acto solo si hay petición del interesado antes de la admisión"],c:1,f:"Ni en vía administrativa ni en vía contenciosa la interposición de recursos suspende automáticamente la ejecución del acto. La suspensión debe pedirse y el tribunal la acuerda o la deniega valorando los intereses en juego."},
+  {b:"J. Simulacro final — preguntas mixtas",q:"La regla 'actus contrarius' en procedimiento administrativo significa que:",opts:["Un acto solo puede revocarse por otro acto del mismo órgano y con el mismo procedimiento","La Administración siempre puede revocar sus actos libremente","Los actos se revocan por la misma vía que se crean, con las garantías correspondientes","Solo el TC puede revocar actos administrativos firmes"],c:2,f:"Actus contrarius = para dejar sin efecto un acto, hay que seguir un procedimiento equivalente al que lo creó, con las garantías correspondientes. La Administración no puede retirar sus actos caprichosamente — necesita seguir el cauce previsto (revisión de oficio, lesividad, recurso)."},
+  {b:"K. Preguntas de detalle normativo",q:"La Ley 39/2015 regula:",opts:["Solo el procedimiento administrativo de la Administración General del Estado","El procedimiento administrativo común de las Administraciones Públicas — estatal, autonómica y local","Solo el procedimiento sancionador","El régimen jurídico de los funcionarios públicos"],c:1,f:"La Ley 39/2015 (LPACAP) regula el procedimiento administrativo común para todas las Administraciones Públicas. Es la norma base del T5. La Ley 40/2015 regula el régimen jurídico del sector público (organización)."},
+  {b:"K. Preguntas de detalle normativo",q:"La Ley 40/2015 regula:",opts:["El procedimiento administrativo común","El régimen jurídico del sector público (organización, órganos, relaciones interadministrativas)","Los derechos de los ciudadanos ante la Administración","El acceso a la información pública"],c:1,f:"Ley 40/2015 (LRJSP) = régimen jurídico del sector público: organización de la AGE, órganos, competencias, relaciones interadministrativas, convenios. Distinta de la Ley 39/2015 que regula el procedimiento. El examen confunde las dos."},
+  {b:"K. Preguntas de detalle normativo",q:"La Administración electrónica y la sede electrónica se regulan en:",opts:["Solo el Real Decreto 1671/2009","La Ley 39/2015 y normativa de desarrollo, incluyendo el Esquema Nacional de Interoperabilidad","Solo en la normativa de la UE","Solo en el Reglamento Europeo eIDAS"],c:1,f:"La Ley 39/2015 incorpora las bases de la administración electrónica (sede electrónica, notificación electrónica, registro electrónico). El ENI y el ENS desarrollan los aspectos técnicos. Tema que conecta con el T10."},
+  {b:"L. Trampas finales de consolidación",q:"'Procedimiento simplificado', 'tramitación de urgencia' y 'procedimiento ordinario' son:",opts:["Tres nombres del mismo procedimiento según su duración","Tres modalidades distintas de tramitación con plazos y requisitos diferentes","La tramitación de urgencia y el simplificado son lo mismo","El procedimiento ordinario está derogado por la Ley 39/2015"],c:1,f:"Son tres modalidades distintas: ordinario (el general), tramitación de urgencia (reduce plazos a la mitad, salvo audiencia y alegaciones), simplificado (resuelve en 30 días para asuntos de poca complejidad o interés público). No confundirlas."},
+  {b:"L. Trampas finales de consolidación",q:"La tramitación de urgencia reduce los plazos:",opts:["A un tercio","A la mitad, salvo los de audiencia y alegaciones","Elimina todos los plazos salvo el de resolución","Solo reduce el plazo de resolución final"],c:1,f:"Tramitación de urgencia: los plazos se reducen a la mitad, salvo los relativos a la presentación de solicitudes y recursos y los de audiencia y alegaciones. No elimina las garantías de defensa."},
+  {b:"L. Trampas finales de consolidación",q:"La información pública como trámite del procedimiento:",opts:["Es obligatoria en todos los procedimientos","Es un trámite potestativo u obligatorio según la naturaleza del procedimiento, que permite a cualquier persona formular alegaciones","Solo pueden participar los interesados formales del procedimiento","Sustituye al trámite de audiencia en todo caso"],c:1,f:"Información pública = trámite que abre el procedimiento a cualquier persona (no solo a los interesados formales) para que formule alegaciones. Es obligatorio cuando la ley lo exige y potestativo en otros casos. No sustituye a la audiencia — son trámites distintos."},
+  {b:"L. Trampas finales de consolidación",q:"La resolución que pone fin al procedimiento debe:",opts:["Resolver solo lo pedido por el interesado, sin pronunciarse sobre otras cuestiones","Decidir todas las cuestiones planteadas y las derivadas del procedimiento, aunque no hayan sido planteadas por los interesados si son conexas","Limitarse a estimar o desestimar sin más motivación","Ser siempre favorable si el procedimiento duró más de 6 meses"],c:1,f:"La resolución debe resolver todas las cuestiones planteadas por los interesados y las conexas que se deriven del procedimiento, aunque no hayan sido planteadas expresamente. Principio de congruencia amplia en derecho administrativo."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx],total=pool.length;
+  document.getElementById('fill').style.width=Math.round((idx/total)*100)+'%';
+  document.getElementById('prog-num').textContent=(idx+1)+' / '+total;
+  document.getElementById('v-ok').textContent=nOk;document.getElementById('v-err').textContent=nErr;
+  document.getElementById('v-pend').textContent=total-idx;
+  document.getElementById('pill').textContent=q.b;
+  document.getElementById('q-num-lbl').textContent='Pregunta '+(idx+1);
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  const opts=document.getElementById('options');opts.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button');btn.className='opt';
+    btn.innerHTML='<span class="letter">'+l+'</span><span>'+q.opts[i]+'</span>';
+    btn.onclick=()=>select(i,btn);opts.appendChild(btn);
+  });
+  const fb=document.getElementById('feedback');fb.className='';fb.innerHTML='';
+  document.getElementById('btn-next').style.display='none';answered=false;
+}
+function select(i,btn){
+  if(answered)return;answered=true;
+  const q=pool[idx];
+  document.querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));
+  const fb=document.getElementById('feedback');
+  if(i===q.c){btn.classList.add('correct');nOk++;fb.className='show ok';fb.innerHTML='<div class="fb-head">Correcto</div><div class="fb-body">'+q.f+'</div>';}
+  else{btn.classList.add('wrong');document.querySelectorAll('.opt')[q.c].classList.add('correct');nErr++;fallos.push({q:q.q,correcta:q.opts[q.c],tuResp:q.opts[i],f:q.f});fb.className='show err';fb.innerHTML='<div class="fb-head">Incorrecto — correcta: '+['A','B','C','D'][q.c]+'</div><div class="fb-body">'+q.f+'</div>';}
+  document.getElementById('v-ok').textContent=nOk;document.getElementById('v-err').textContent=nErr;
+  document.getElementById('btn-next').style.display='inline-block';
+}
+function nextQ(){idx++;render();}
+function showResults(){
+  ['header','progress-wrap','stats-row','q-card','options','feedback','btn-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const total=pool.length,pct=Math.round((nOk/total)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  document.getElementById('res-title').textContent=pct>=80?'T5 dominado — a por el T6':pct>=60?'Nivel sólido — repasa los fallos antes de avanzar':'Refuerza plazos, silencio e invalidez';
+  document.getElementById('res-sub').textContent=nOk+' correctas de '+total+'.'+(fallos.length>0?' '+fallos.length+' para repasar.':' Sin errores.');
+  if(!fallos.length)document.getElementById('btn-fallos').style.display='none';
+  if(fallos.length){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent='Preguntas falladas ('+fallos.length+')';
+    const fl=document.getElementById('fallos-list');fl.innerHTML='';
+    fallos.forEach(f=>{const d=document.createElement('div');d.className='fallo';d.innerHTML='<div class="fallo-q">'+f.q+'</div><div class="fallo-badges"><span class="badge err">Tu respuesta: '+f.tuResp+'</span><span class="badge ok">Correcta: '+f.correcta+'</span></div><div class="fallo-exp">'+f.f+'</div>';fl.appendChild(d);});
+  }
+  document.getElementById('results').style.display='block';
+}
+function restart(){pool=[...ALL_Q];idx=0;nOk=0;nErr=0;fallos=[];document.getElementById('results').style.display='none';['header','progress-wrap','stats-row','q-card','options','btn-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});document.getElementById('stats-row').style.display='grid';render();}
+function soloFallos(){if(!fallos.length)return;pool=fallos.map(f=>ALL_Q.find(q=>q.q===f.q)).filter(Boolean);idx=0;nOk=0;nErr=0;fallos=[];document.getElementById('results').style.display='none';['header','progress-wrap','stats-row','q-card','options','btn-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});document.getElementById('stats-row').style.display='grid';render();}
+render();
+</script>
+</body>
+</html>

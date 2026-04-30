@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 1 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --surface2: #f1f0ed;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18;
+    --text2: #5a5a56;
+    --text3: #9a9a94;
+    --ok: #1a7a4a;
+    --ok-bg: #eaf5ee;
+    --ok-border: rgba(26,122,74,0.25);
+    --err: #c0392b;
+    --err-bg: #fdf0ee;
+    --err-border: rgba(192,57,43,0.25);
+    --accent: #1a1a18;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181a;
+      --surface: #222224;
+      --surface2: #2a2a2c;
+      --border: rgba(255,255,255,0.1);
+      --border-strong: rgba(255,255,255,0.2);
+      --text: #f0efec;
+      --text2: #a0a09a;
+      --text3: #606060;
+      --ok: #4caf7a;
+      --ok-bg: rgba(76,175,122,0.12);
+      --ok-border: rgba(76,175,122,0.3);
+      --err: #e57373;
+      --err-bg: rgba(229,115,115,0.12);
+      --err-border: rgba(229,115,115,0.3);
+      --accent: #f0efec;
+    }
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  /* ── Header ── */
+  #header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  #header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+    letter-spacing: -0.01em;
+  }
+  #header p {
+    font-size: 13px;
+    color: var(--text3);
+  }
+  #pill-bloque {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border-strong);
+    color: var(--text2);
+    background: var(--surface2);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── Progress ── */
+  #progress-wrap { margin-bottom: 1.25rem; }
+  #progress-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 7px;
+  }
+  #progress-row span:last-child { font-weight: 500; color: var(--text2); }
+  #progress-track {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #progress-fill {
+    height: 3px;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ── Stats ── */
+  #stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .stat .lbl {
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .stat .val {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  #sc-ok .val { color: var(--ok); }
+  #sc-err .val { color: var(--err); }
+
+  /* ── Question card ── */
+  #q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  #q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  #q-meta .dot {
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    display: inline-block;
+  }
+  #q-text {
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* ── Options ── */
+  #options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.55;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    width: 100%;
+  }
+  .opt:hover:not(.disabled) {
+    border-color: var(--border-strong);
+    background: var(--surface2);
+    transform: translateY(-1px);
+  }
+  .opt:active:not(.disabled) { transform: translateY(0); }
+  .letter {
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
+  .opt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { border-color: var(--err-border); background: var(--err-bg); }
+  .opt.wrong .letter { background: var(--err); border-color: var(--err); color: #fff; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+
+  /* ── Feedback ── */
+  #feedback {
+    display: none;
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    margin-bottom: 1rem;
+    border: 1px solid;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  #feedback.show { display: block; }
+  #feedback.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+  #feedback.err { background: var(--err-bg); border-color: var(--err-border); }
+  #feedback .fb-head {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 5px;
+  }
+  #feedback.ok .fb-head { color: var(--ok); }
+  #feedback.err .fb-head { color: var(--err); }
+  #feedback .fb-body { color: var(--text2); }
+
+  /* ── Button ── */
+  #btn-row { display: flex; justify-content: flex-end; }
+  #btn-next {
+    display: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: -0.01em;
+  }
+  #btn-next:hover { opacity: 0.85; }
+  #btn-next:active { transform: scale(0.98); }
+
+  /* ── Results ── */
+  #results { display: none; padding: 1rem 0; }
+  #res-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  #res-pct {
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  #res-info h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  #res-info p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  #res-btns { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-sec {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-sec:hover { background: var(--surface2); }
+  .btn-sec:active { transform: scale(0.98); }
+  .btn-prim {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: transparent;
+  }
+  .btn-prim:hover { opacity: 0.85; background: var(--accent); }
+
+  /* ── Fallos ── */
+  #fallos-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  #fallos-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .fallo {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .fallo:last-child { border-bottom: none; }
+  .fallo-q {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .fallo-badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .badge.err { background: var(--err-bg); border-color: var(--err-border); color: var(--err); }
+  .badge.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .fallo-exp { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+  @media (max-width: 500px) {
+    body { padding: 1rem 0.75rem 3rem; }
+    #res-hero { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    #res-pct { font-size: 48px; }
+    #header { flex-direction: column; gap: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="header">
+    <div>
+      <h1>Tema 1 · Oposición Generalitat</h1>
+      <p>50 preguntas · CE, EAC, competencias y Govern</p>
+    </div>
+    <div id="pill-bloque"></div>
+  </div>
+
+  <div id="progress-wrap">
+    <div id="progress-row">
+      <span>Progreso</span>
+      <span id="prog-num">1 / 50</span>
+    </div>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+  </div>
+
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">50</div></div>
+  </div>
+
+  <div id="q-card">
+    <div id="q-meta">
+      <span id="q-num-lbl"></span>
+      <span class="dot"></span>
+      <span id="q-bloque-lbl"></span>
+    </div>
+    <div id="q-text"></div>
+  </div>
+
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info">
+        <h2 id="res-title"></h2>
+        <p id="res-sub"></p>
+      </div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+const ALL_Q=[
+  {b:"A. Estructura CE",q:"La Constitución Española de 1978 se caracteriza como:",opts:["abierta, breve y flexible","cerrada, extensa y rígida","consuetudinaria y federal","provisional y descentralizada"],c:1,f:"La CE es cerrada (texto escrito formal), extensa (169 artículos) y rígida (reforma difícil). Trampa: no confundir rígida con inflexible absoluta."},
+  {b:"A. Estructura CE",q:"El Preámbulo de la Constitución tiene:",opts:["valor jurídico obligatorio directo equivalente a un artículo","valor político e interpretativo, sin fuerza jurídica obligatoria directa","carácter reglamentario","rango inferior a una ley ordinaria"],c:1,f:"El Preámbulo orienta e interpreta pero no tiene mandato jurídico directo. Error típico: darle el mismo valor que los artículos."},
+  {b:"A. Estructura CE",q:"La parte dogmática de la Constitución comprende:",opts:["Títulos II a X","Título Preliminar y Título I","solo el Título Preliminar","las disposiciones adicionales y transitorias"],c:1,f:"Dogmática = Título Preliminar + Título I (principios y derechos). Orgánica = Títulos II a X (órganos). Ancla: DOGMÁTICA = principios y derechos."},
+  {b:"A. Estructura CE",q:"¿Qué bloque constitucional regula la organización territorial del Estado?",opts:["Título V","Título VI","Título VIII","Título IX"],c:2,f:"Título VIII = organización territorial. Título IX = Tribunal Constitucional. Título X = reforma. Dato muy preguntado."},
+  {b:"A. Estructura CE",q:"La parte dispositiva de la Constitución incluye:",opts:["solo el Preámbulo","los Títulos II a X","adicionales, transitorias, derogatoria y final","únicamente la disposición derogatoria"],c:2,f:"Dispositiva = 4 adicionales + 9 transitorias + 1 derogatoria + 1 final. No confundir con la parte orgánica (Títulos II-X)."},
+  {b:"B. Título Preliminar",q:"España se constituye según el art. 1 CE en un Estado:",opts:["federal y presidencialista","social y democrático de Derecho","autoritario descentralizado","social y monárquico sin división de poderes"],c:1,f:"Fórmula literal del art. 1 CE: Estado social y democrático de Derecho. La forma política (monarquía parlamentaria) es algo distinto — no confundir."},
+  {b:"B. Título Preliminar",q:"¿Cuál NO es un valor superior del ordenamiento jurídico según el art. 1 CE?",opts:["libertad","pluralismo político","seguridad jurídica","igualdad"],c:2,f:"Los 4 valores superiores del art. 1 CE: libertad, justicia, igualdad y pluralismo político. Seguridad jurídica es un principio del art. 9.3, no un valor superior. Trampa clásica."},
+  {b:"B. Título Preliminar",q:"La interdicción de la arbitrariedad de los poderes públicos se encuentra en el:",opts:["art. 1 CE","art. 2 CE","art. 9.3 CE","art. 10 CE"],c:2,f:"Art. 9.3 CE: legalidad, jerarquía normativa, publicidad, irretroactividad, seguridad jurídica, responsabilidad e interdicción de la arbitrariedad."},
+  {b:"B. Título Preliminar",q:"El art. 2 CE combina:",opts:["unidad del Estado y derecho de autodeterminación","unidad indisoluble, autonomía de nacionalidades y regiones y solidaridad","soberanía popular y pluralismo político","seguridad jurídica y jerarquía normativa"],c:1,f:"Tríada del art. 2 CE: unidad indisoluble + autonomía de nacionalidades y regiones + solidaridad entre ellas. No dice autodeterminación."},
+  {b:"B. Título Preliminar",q:"Los partidos políticos como instrumento de participación aparecen en el:",opts:["art. 6 CE","art. 7 CE","art. 8 CE","art. 9 CE"],c:0,f:"Art. 6 = partidos. Art. 7 = sindicatos y asociaciones empresariales. Art. 8 = Fuerzas Armadas. Dato muy preguntado: no mezclar estos tres artículos."},
+  {b:"B. Título Preliminar",q:"Confundir los valores superiores del art. 1 CE con los principios del art. 9.3 CE es:",opts:["correcto si la pregunta es doctrinal","incorrecto, porque pertenecen a preceptos distintos","correcto si se habla del Estado social","irrelevante en un test"],c:1,f:"Son dos preceptos distintos con contenido distinto. El examen explota sistemáticamente esta confusión."},
+  {b:"C. Reforma constitucional",q:"El procedimiento ordinario de reforma constitucional se regula en el:",opts:["art. 166 CE","art. 167 CE","art. 168 CE","art. 169 CE"],c:1,f:"Art. 167 = reforma ordinaria (3/5 de cada Cámara). Art. 168 = reforma agravada (2/3 + disolución + referéndum obligatorio). Art. 169 = límite temporal."},
+  {b:"C. Reforma constitucional",q:"La reforma que afecte al Título Preliminar debe tramitarse por el procedimiento:",opts:["ordinario","agravado","abreviado","mixto"],c:1,f:"Título Preliminar, Sección 1.ª Cap. II Título I (arts. 15-29) y Título II (Corona) = procedimiento agravado del art. 168. Todo lo demás = art. 167."},
+  {b:"C. Reforma constitucional",q:"La aprobación inicial en el procedimiento agravado (art. 168 CE) exige:",opts:["3/5 de cada Cámara","mayoría absoluta de cada Cámara","2/3 de cada Cámara","2/3 del Congreso y mayoría absoluta del Senado"],c:2,f:"Art. 168: 2/3 de cada Cámara → disolución → nuevas Cortes ratifican y aprueban por 2/3 → referéndum obligatorio. No confundir con los 3/5 del art. 167."},
+  {b:"C. Reforma constitucional",q:"En el procedimiento ordinario (art. 167 CE), el referéndum:",opts:["es siempre obligatorio","solo se celebra si lo pide 1/10 de los miembros de una Cámara en 15 días","requiere petición del Gobierno","solo lo solicita el Senado"],c:1,f:"En el art. 167 el referéndum es opcional: lo pide 1/10 de diputados o senadores en 15 días. En el art. 168 es obligatorio. Trampa clásica."},
+  {b:"C. Reforma constitucional",q:"¿Cuál identifica claramente una pregunta sobre el art. 168 CE?",opts:["comisión paritaria y 3/5","disolución de las Cortes y referéndum obligatorio de ratificación","referéndum solo si lo pide una décima parte","mayoría absoluta del Senado"],c:1,f:"Art. 168 tiene dos señas inconfundibles: disolución automática de las Cortes y referéndum obligatorio de ratificación."},
+  {b:"C. Reforma constitucional",q:"No puede iniciarse la reforma constitucional:",opts:["durante cualquier legislatura en minoría","en tiempo de guerra ni durante los estados del art. 116 CE","si hay recurso de inconstitucionalidad pendiente","durante el primer año de mandato del Gobierno"],c:1,f:"Art. 169 CE: la reforma no puede iniciarse en tiempo de guerra ni durante los estados de alarma, excepción o sitio (art. 116 CE)."},
+  {b:"D. Título I CE",q:"El art. 10 CE se refiere a:",opts:["la unidad de la Nación española","la dignidad de la persona y el libre desarrollo de la personalidad","la reforma constitucional","la capital del Estado"],c:1,f:"Art. 10 CE: pórtico del Título I — dignidad de la persona y libre desarrollo de la personalidad. También fija que los derechos se interpretan conforme a la DUDH y tratados internacionales."},
+  {b:"D. Título I CE",q:"En sentido estricto, los derechos fundamentales son los comprendidos entre los arts.:",opts:["14 y 29 CE","15 y 29 CE","15 y 38 CE","24 y 29 CE"],c:1,f:"Derechos fundamentales en sentido estricto: arts. 15 a 29 CE. El art. 14 tiene protección reforzada aunque está fuera de ese tramo. Trampa: no es 14-29 sino 15-29."},
+  {b:"D. Título I CE",q:"Además de los arts. 15 a 29, goza de protección reforzada el art.:",opts:["10","13","14","30"],c:2,f:"El art. 14 CE (igualdad) tiene protección reforzada por el art. 53.2 CE aunque está fuera del rango 15-29. Dato de trampa muy frecuente."},
+  {b:"D. Título I CE",q:"Los principios rectores de la política social y económica se recogen en el:",opts:["Capítulo II","Capítulo III","Capítulo IV","Capítulo V"],c:1,f:"Capítulo III del Título I = principios rectores (salud, medio ambiente, vivienda...). Tienen protección mínima o programática, no la reforzada del amparo."},
+  {b:"D. Título I CE",q:"Afirmar que todo derecho del Título I es automáticamente un derecho fundamental en sentido estricto es:",opts:["correcto","incorrecto","correcto salvo en el Capítulo III","correcto si se trata del EAC"],c:1,f:"Error clásico. Solo son fundamentales en sentido estricto los arts. 15-29. Los del Capítulo III son principios rectores con distinta protección."},
+  {b:"E. Arts. 15-20 CE",q:"El art. 15 CE protege:",opts:["vida e integridad física y moral","libertad ideológica","libertad y seguridad","intimidad domiciliaria"],c:0,f:"Microesquema: 15=vida, 16=ideología/religión, 17=libertad/seguridad, 18=intimidad/domicilio, 19=circulación, 20=expresión. Memorízalo entero."},
+  {b:"E. Arts. 15-20 CE",q:"La detención preventiva no podrá durar más de:",opts:["24 horas","48 horas","72 horas","96 horas"],c:2,f:"Art. 17 CE: detención preventiva máximo 72 horas. Pasadas las 72h debe ponerse a la persona en libertad o a disposición judicial."},
+  {b:"E. Arts. 15-20 CE",q:"La libertad ideológica, religiosa y de culto se reconoce en el art.:",opts:["15 CE","16 CE","17 CE","18 CE"],c:1,f:"Art. 16 CE: libertad ideológica, religiosa y de culto. Nadie puede ser obligado a declarar sobre ideología, religión o creencias. Art. 17 = libertad y seguridad personal."},
+  {b:"E. Arts. 15-20 CE",q:"El honor, la intimidad personal y familiar y la propia imagen se recogen en el art.:",opts:["17 CE","18 CE","19 CE","20 CE"],c:1,f:"Art. 18 CE: honor + intimidad personal y familiar + propia imagen + inviolabilidad del domicilio + secreto de las comunicaciones. Cuatro garantías en un artículo."},
+  {b:"E. Arts. 15-20 CE",q:"El secuestro de publicaciones solo puede acordarse por:",opts:["autoridad administrativa","fiscal jefe","resolución judicial","delegado del Gobierno"],c:2,f:"Art. 20 CE: no hay censura previa. El secuestro de publicaciones solo puede acordarse mediante resolución judicial, nunca por autoridad administrativa."},
+  {b:"E. Arts. 15-20 CE",q:"Si en una pregunta aparecen 72 horas, abogado, habeas corpus y derechos del detenido, debes pensar en el art.:",opts:["16 CE","17 CE","18 CE","24 CE"],c:1,f:"Art. 17 CE: libertad y seguridad, detención preventiva máximo 72h, asistencia letrada y habeas corpus. Regla ancla para no confundir con el art. 24."},
+  {b:"F. Participación y garantías",q:"Las reuniones en lugares de tránsito público y manifestaciones exigen:",opts:["autorización judicial previa","comunicación previa","licencia municipal","ningún requisito"],c:1,f:"Art. 21 CE: las reuniones en lugares de tránsito público requieren comunicación previa, no autorización. Trampa: confundir comunicar con pedir permiso."},
+  {b:"F. Participación y garantías",q:"Quedan fuera del derecho de asociación las asociaciones:",opts:["de interés cultural","de vecinos","ilícitas, secretas o paramilitares","juveniles"],c:2,f:"Art. 22 CE: las asociaciones ilícitas, secretas y paramilitares quedan fuera del derecho de asociación. Las paramilitares son las que el examen usa como trampa."},
+  {b:"F. Participación y garantías",q:"La tutela judicial efectiva se reconoce en el art.:",opts:["23 CE","24 CE","25 CE","26 CE"],c:1,f:"Art. 24 CE: tutela judicial efectiva, no indefensión, presunción de inocencia, no declararse culpable. Art. 25 = principio de legalidad sancionadora."},
+  {b:"F. Participación y garantías",q:"La Administración civil no puede imponer sanciones que impliquen:",opts:["suspensión de empleo","privación de libertad","multa coercitiva","apercibimiento"],c:1,f:"Art. 25 CE: la Administración civil no puede imponer sanciones que impliquen privación de libertad. Solo la autoridad judicial puede hacerlo."},
+  {b:"F. Participación y garantías",q:"Meter en el mismo saco 'derechos fundamentales', 'derechos del Título I' y 'principios rectores' es:",opts:["correcto si se cita el art. 10","un error típico de examen","obligatorio en tests de oposición","una equivalencia doctrinal"],c:1,f:"Son tres categorías distintas con niveles de protección distintos. Confundirlas es el error más explotado en este bloque."},
+  {b:"G. Estatut d'Autonomia",q:"Cataluña aparece en el EAC como:",opts:["Estado federado soberano","provincia histórica","nacionalidad constituida en comunidad autónoma","región administrativa sin identidad propia"],c:2,f:"El EAC define Cataluña como una nacionalidad que se constituye en comunidad autónoma. No es Estado federado ni región administrativa."},
+  {b:"G. Estatut d'Autonomia",q:"El Síndic de Greuges integra:",opts:["la Corona","la Generalitat","las Cortes Generales","el Gobierno del Estado"],c:1,f:"El Síndic de Greuges (defensor del pueblo catalán) integra la Generalitat, junto al Parlament, la Presidència, el Govern, la Sindicatura de Comptes y el Consell de Garanties Estatutàries."},
+  {b:"G. Estatut d'Autonomia",q:"El aranés es:",opts:["lengua cooficial solo estatal","lengua propia de Aran y también oficial en Catalunya","dialecto sin reconocimiento oficial","lengua exclusiva del Parlament"],c:1,f:"El aranés (occitano del Valle de Arán) es lengua propia del Arán y tiene carácter oficial en toda Cataluña según el EAC."},
+  {b:"G. Estatut d'Autonomia",q:"La condición política de catalanes la tienen:",opts:["todos los residentes extranjeros en Cataluña","los ciudadanos españoles con vecindad administrativa en Catalunya","solo los nacidos en Cataluña","solo quienes voten en elecciones autonómicas"],c:1,f:"La condición de catalán/a la tiene el ciudadano español con vecindad administrativa en Cataluña. No basta nacer allí ni residir siendo extranjero."},
+  {b:"G. Estatut d'Autonomia",q:"No debe confundirse:",opts:["Constitución con leyes orgánicas","CE como marco general del Estado y EAC como norma institucional básica de autogobierno de Catalunya","Parlament con Govern","Presidència con Tribunal Constitucional"],c:1,f:"La CE es el marco general del Estado. El EAC es la norma institucional básica de autogobierno de Cataluña. Ambas coexisten y se complementan."},
+  {b:"H. Competencias",q:"Las competencias exclusivas de la Generalitat implican:",opts:["solo función ejecutiva","potestad legislativa, reglamentaria y función ejecutiva íntegramente","ejecución de normativa estatal sin desarrollo propio","actuación solo en materias compartidas"],c:1,f:"Exclusiva = todo (legislar + reglamentar + ejecutar). Compartida = bases del Estado + desarrollo catalán. Ejecutiva = solo ejecutar y organizar la Administración."},
+  {b:"H. Competencias",q:"Las competencias compartidas significan que la Generalitat:",opts:["carece de potestad legislativa","solo puede dictar reglamentos internos","actúa dentro del marco de las bases que fije el Estado","puede desplazar siempre la normativa estatal"],c:2,f:"Compartida = Estado fija las bases (mínimo común) + Cataluña desarrolla legislativamente y ejecuta dentro de ese marco."},
+  {b:"H. Competencias",q:"Si en una pregunta aparece 'bases estatales', casi seguro que se habla de competencias:",opts:["exclusivas","compartidas","ejecutivas","residuales"],c:1,f:"Las bases estatales son la seña de identidad de las competencias compartidas. En las exclusivas no hay bases estatales; en las ejecutivas hay normativa estatal completa."},
+  {b:"H. Competencias",q:"Pensar que una competencia compartida significa 'mitad y mitad' es:",opts:["correcto","una simplificación errónea","exacto si interviene el Parlament","obligatorio en doctrina catalana"],c:1,f:"Compartida no es mitad y mitad. El Estado fija las bases y Cataluña desarrolla e implementa dentro de ese marco."},
+  {b:"H. Competencias",q:"El art. 110 EAC regula las competencias:",opts:["compartidas","ejecutivas","exclusivas","fiscales"],c:2,f:"Art. 110 = exclusivas, art. 111 = compartidas, art. 112 = ejecutivas. Este trío se pregunta mucho — memorízalo en orden."},
+  {b:"H. Competencias",q:"La STC 31/2010 recordó que las bases estatales en competencias compartidas:",opts:["solo pueden fijarse por reforma constitucional","quedan reducidas exclusivamente a normas con rango de ley","también pueden incluir normas reglamentarias básicas","desaparecen en las competencias compartidas"],c:2,f:"La STC 31/2010 aclaró que las bases del Estado no se limitan a normas legales: también pueden ser reglamentarias cuando sea necesario."},
+  {b:"I. Presidència i Govern",q:"El president/a de la Generalitat es elegido por:",opts:["el Rey entre los diputados autonómicos","el Govern entre sus consellers","el Parlament entre sus miembros","sufragio universal directo"],c:2,f:"El president/a es elegido por el Parlament entre sus miembros mediante investidura. Luego es nombrado por el Rey. No hay elección directa."},
+  {b:"I. Presidència i Govern",q:"El president/a de la Generalitat es a la vez:",opts:["solo jefe del Govern","solo máxima representación de la Generalitat","jefe del Govern, máxima representación de la Generalitat y representante ordinario del Estado en Catalunya","jefe del Parlament y del Govern"],c:2,f:"Triple función simultánea: jefe del Govern + máxima representación de la Generalitat + representante ordinario del Estado en Cataluña."},
+  {b:"I. Presidència i Govern",q:"Si transcurren dos meses desde la primera votación de investidura sin elección:",opts:["se nombra automáticamente al candidato más votado","el Parlament se disuelve automáticamente y se convocan elecciones","interviene el Senado","se prorroga el Govern indefinidamente"],c:1,f:"Regla del EAC: si 2 meses después de la primera votación de investidura no hay president/a, el Parlament se disuelve automáticamente y se convocan elecciones."},
+  {b:"I. Presidència i Govern",q:"Entre las funciones del Govern se encuentran:",opts:["aprobar proyectos de ley, elaborar presupuestos y ejercer potestad reglamentaria","nombrar al Rey y reformar la Constitución","dictar sentencias firmes","convocar referéndums estatales por sí solo"],c:0,f:"El Govern: aprueba proyectos de ley, elabora presupuestos, ejerce potestad reglamentaria y dirige la acción política y la Administración de la Generalitat."},
+  {b:"I. Presidència i Govern",q:"El Govern puede dictar:",opts:["solo reglamentos internos","decretos legislativos y decretos ley","únicamente leyes orgánicas","sentencias con fuerza de ley"],c:1,f:"El Govern puede dictar decretos legislativos (delegación del Parlament) y decretos ley (urgencia). No puede dictar leyes orgánicas — esas son del Estado."},
+  {b:"I. Presidència i Govern",q:"Cuando está en funciones, el Govern no puede:",opts:["realizar ningún acto administrativo","aprobar el proyecto de ley de presupuestos, presentar proyectos de ley al Parlament ni dictar decretos legislativos","reunirse","ejercer potestad reglamentaria alguna"],c:1,f:"El Govern en funciones mantiene actividad limitada pero no puede: aprobar presupuestos, presentar proyectos de ley ni dictar decretos legislativos. No está paralizado al 100%."},
+  {b:"I. Presidència i Govern",q:"Si preguntan quién manda políticamente en Cataluña debes pensar en:",opts:["Tribunal Constitucional y Senado","Presidència + Govern + control del Parlament","Parlament y Rey sin más","solo en el president o presidenta"],c:1,f:"Estructura de poder político en Cataluña: el president/a dirige el Govern, el Govern ejecuta la acción política, y el Parlament controla al Govern. Los tres vértices juntos."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx],total=pool.length;
+  const pct=Math.round((idx/total)*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('prog-num').textContent=(idx+1)+' / '+total;
+  document.getElementById('v-ok').textContent=nOk;
+  document.getElementById('v-err').textContent=nErr;
+  document.getElementById('v-pend').textContent=total-idx;
+  document.getElementById('pill-bloque').textContent=q.b;
+  document.getElementById('q-num-lbl').textContent='Pregunta '+(idx+1);
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML='<span class="letter">'+l+'</span><span>'+q.opts[i]+'</span>';
+    btn.onclick=()=>select(i,btn);
+    opts.appendChild(btn);
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='';fb.innerHTML='';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+}
+
+function select(i,btn){
+  if(answered)return;
+  answered=true;
+  const q=pool[idx];
+  document.querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));
+  const fb=document.getElementById('feedback');
+  if(i===q.c){
+    btn.classList.add('correct');
+    nOk++;
+    fb.className='show ok';
+    fb.innerHTML='<div class="fb-head">Correcto</div><div class="fb-body">'+q.f+'</div>';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt')[q.c].classList.add('correct');
+    nErr++;
+    fallos.push({q:q.q,correcta:q.opts[q.c],tuResp:q.opts[i],f:q.f});
+    fb.className='show err';
+    fb.innerHTML='<div class="fb-head">Incorrecto — correcta: '+['A','B','C','D'][q.c]+'</div><div class="fb-body">'+q.f+'</div>';
+  }
+  document.getElementById('v-ok').textContent=nOk;
+  document.getElementById('v-err').textContent=nErr;
+  document.getElementById('btn-next').style.display='inline-block';
+}
+
+function nextQ(){idx++;render();}
+
+function showResults(){
+  ['header','progress-wrap','stats-row','q-card','options','feedback','btn-row'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  const total=pool.length,pct=Math.round((nOk/total)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  document.getElementById('res-title').textContent=
+    pct>=80?'Buen nivel en este tema':pct>=60?'Nivel medio — sigue practicando':'Refuerza antes de avanzar';
+  document.getElementById('res-sub').textContent=
+    nOk+' correctas de '+total+'.'+(fallos.length>0?' Tienes '+fallos.length+' preguntas falladas para repasar.':' Sin errores — excelente trabajo.');
+  if(!fallos.length)document.getElementById('btn-fallos').style.display='none';
+  if(fallos.length){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent='Preguntas falladas ('+fallos.length+')';
+    const fl=document.getElementById('fallos-list');fl.innerHTML='';
+    fallos.forEach(f=>{
+      const d=document.createElement('div');d.className='fallo';
+      d.innerHTML='<div class="fallo-q">'+f.q+'</div>'
+        +'<div class="fallo-badges">'
+        +'<span class="badge err">Tu respuesta: '+f.tuResp+'</span>'
+        +'<span class="badge ok">Correcta: '+f.correcta+'</span>'
+        +'</div>'
+        +'<div class="fallo-exp">'+f.f+'</div>';
+      fl.appendChild(d);
+    });
+  }
+  document.getElementById('results').style.display='block';
+}
+
+function restart(){
+  pool=[...ALL_Q];idx=0;nOk=0;nErr=0;fallos=[];
+  document.getElementById('results').style.display='none';
+  ['header','progress-wrap','stats-row','q-card','options','btn-row'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='';
+  });
+  document.getElementById('stats-row').style.display='grid';
+  render();
+}
+
+function soloFallos(){
+  if(!fallos.length)return;
+  pool=fallos.map(f=>ALL_Q.find(q=>q.q===f.q)).filter(Boolean);
+  idx=0;nOk=0;nErr=0;fallos=[];
+  document.getElementById('results').style.display='none';
+  ['header','progress-wrap','stats-row','q-card','options','btn-row'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='';
+  });
+  document.getElementById('stats-row').style.display='grid';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
