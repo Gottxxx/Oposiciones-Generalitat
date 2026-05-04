@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 7 Parte 2/3 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7f4; --surface: #ffffff; --surface2: #f1f0ed;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+    --ok: #1a7a4a; --ok-bg: #eaf5ee; --ok-border: rgba(26,122,74,0.25);
+    --err: #c0392b; --err-bg: #fdf0ee; --err-border: rgba(192,57,43,0.25);
+    --accent: #1a1a18; --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181a; --surface: #222224; --surface2: #2a2a2c;
+      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+      --text: #f0efec; --text2: #a0a09a; --text3: #606060;
+      --ok: #4caf7a; --ok-bg: rgba(76,175,122,0.12); --ok-border: rgba(76,175,122,0.3);
+      --err: #e57373; --err-bg: rgba(229,115,115,0.12); --err-border: rgba(229,115,115,0.3);
+      --accent: #f0efec;
+    }
+  }
+  html { font-size: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
+  #app { width: 100%; max-width: 680px; }
+  #header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  #header h1 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+  #header p { font-size: 13px; color: var(--text3); }
+  #pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-strong); color: var(--text2); background: var(--surface2); white-space: nowrap; flex-shrink: 0; }
+  #progress-wrap { margin-bottom: 1.25rem; }
+  #progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 7px; }
+  #progress-row span:last-child { font-weight: 500; color: var(--text2); }
+  #track { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  #fill { height: 3px; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+  #stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  #sc-ok .val { color: var(--ok); }
+  #sc-err .val { color: var(--err); }
+  #q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  #q-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #q-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); display: inline-block; }
+  #q-text { font-size: 16px; color: var(--text); line-height: 1.65; }
+  #options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; line-height: 1.55; transition: border-color 0.15s, background 0.15s, transform 0.1s; width: 100%; }
+  .opt:hover:not(.disabled) { border-color: var(--border-strong); background: var(--surface2); transform: translateY(-1px); }
+  .opt:active:not(.disabled) { transform: translateY(0); }
+  .letter { min-width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; margin-top: 1px; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
+  .opt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { border-color: var(--err-border); background: var(--err-bg); }
+  .opt.wrong .letter { background: var(--err); border-color: var(--err); color: #fff; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  #feedback { display: none; border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 1rem; border: 1px solid; font-size: 13px; line-height: 1.65; }
+  #feedback.show { display: block; }
+  #feedback.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+  #feedback.err { background: var(--err-bg); border-color: var(--err-border); }
+  #feedback .fb-head { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+  #feedback.ok .fb-head { color: var(--ok); }
+  #feedback.err .fb-head { color: var(--err); }
+  #feedback .fb-body { color: var(--text2); }
+  #btn-row { display: flex; justify-content: flex-end; }
+  #btn-next { display: none; font-size: 13px; font-weight: 500; padding: 10px 20px; border-radius: var(--radius-sm); background: var(--accent); color: var(--bg); border: none; cursor: pointer; transition: opacity 0.15s; }
+  #btn-next:hover { opacity: 0.85; }
+  #results { display: none; padding: 1rem 0; }
+  #res-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 2rem; }
+  #res-pct { font-size: 64px; font-weight: 700; color: var(--text); letter-spacing: -0.04em; line-height: 1; flex-shrink: 0; }
+  #res-info h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #res-info p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  #res-btns { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-sec { font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; transition: background 0.15s; }
+  .btn-sec:hover { background: var(--surface2); }
+  .btn-prim { background: var(--accent); color: var(--bg); border-color: transparent; }
+  .btn-prim:hover { opacity: 0.85; background: var(--accent); }
+  #fallos-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  #fallos-section h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .fallo { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .fallo:last-child { border-bottom: none; }
+  .fallo-q { font-size: 14px; color: var(--text); margin-bottom: 8px; line-height: 1.5; font-weight: 500; }
+  .fallo-badges { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .badge.err { background: var(--err-bg); border-color: var(--err-border); color: var(--err); }
+  .badge.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .fallo-exp { font-size: 12px; color: var(--text3); line-height: 1.6; }
+  @media (max-width: 500px) { body { padding: 1rem 0.75rem 3rem; } #res-hero { flex-direction: column; gap: 1rem; align-items: flex-start; } #res-pct { font-size: 48px; } #header { flex-direction: column; gap: 0.75rem; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <h1>Tema 7 Parte 2/3 · Oposición Generalitat</h1>
+      <p>62 preguntas · Presupuestos: estructura y clasificación económica</p>
+    </div>
+    <div id="pill"></div>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-row"><span>Progreso</span><span id="prog-num">1 / 50</span></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">50</div></div>
+  </div>
+  <div id="q-card">
+    <div id="q-meta"><span id="q-num-lbl"></span><span class="dot"></span><span id="q-bloque-lbl"></span></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info"><h2 id="res-title"></h2><p id="res-sub"></p></div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_Q = [
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 5 es:",opts:["Inversiones reales","Fondo de contingencia y otros imprevistos","Transferencias de capital","Activos financieros"],c:1,f:"Capítulo 5 de gastos = fondo de contingencia y otros imprevistos."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 6 corresponde a:",opts:["Inversiones reales","Enajenación de inversiones reales","Activos financieros","Gastos financieros"],c:0,f:"Capítulo 6 de gastos = inversiones reales."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 7 corresponde a:",opts:["Transferencias corrientes","Transferencias de capital","Pasivos financieros","Bienes corrientes y servicios"],c:1,f:"Capítulo 7 de gastos = transferencias de capital."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 8 corresponde a:",opts:["Activos financieros","Pasivos financieros","Ingresos patrimoniales","Impuestos indirectos"],c:0,f:"Capítulo 8 de gastos = activos financieros."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 9 corresponde a:",opts:["Pasivos financieros","Activos financieros","Personal","Transferencias corrientes"],c:0,f:"Capítulo 9 de gastos = pasivos financieros."},
+  {b:"Tema 7",q:"Los capítulos 1 a 5 se consideran, con carácter general:",opts:["Operaciones de capital","Operaciones financieras","Operaciones corrientes","Operaciones de control"],c:2,f:"La regla mental del resumen indica 1-5 = operaciones corrientes."},
+  {b:"Tema 7",q:"Los capítulos 6 y 7 se consideran:",opts:["Operaciones corrientes","Operaciones de capital","Operaciones financieras","Operaciones extrapresupuestarias"],c:1,f:"La regla mental fija 6-7 = operaciones de capital."},
+  {b:"Tema 7",q:"Los capítulos 8 y 9 se consideran:",opts:["Operaciones financieras","Operaciones corrientes","Operaciones de personal","Operaciones de programación"],c:0,f:"La regla mental fija 8-9 = operaciones financieras."},
+  {b:"Tema 7",q:"¿Cuál de estas parejas es correcta?",opts:["Ingresos cap. 4 = transferencias corrientes; gastos cap. 4 = transferencias corrientes","Ingresos cap. 4 = transferencias de capital; gastos cap. 4 = inversiones reales","Ingresos cap. 4 = impuestos indirectos; gastos cap. 4 = personal","Ingresos cap. 4 = activos financieros; gastos cap. 4 = gastos financieros"],c:0,f:"Tanto en ingresos como en gastos el capítulo 4 es de transferencias corrientes."},
+  {b:"Tema 7",q:"¿Qué afirmación es correcta sobre las transferencias corrientes y de capital?",opts:["Son sinónimos presupuestarios","Las corrientes financian gasto corriente y las de capital inversión o capital","Las de capital pertenecen siempre al capítulo 5","Las corrientes son operaciones financieras"],c:1,f:"El resumen advierte no confundir ambas: las corrientes financian gasto corriente y las de capital, inversión o capital."},
+  {b:"Tema 7",q:"¿Qué capítulo de ingresos recoge los activos financieros?",opts:["7","8","5","9"],c:1,f:"El capítulo 8 de ingresos corresponde a activos financieros."},
+  {b:"Tema 7",q:"¿Qué capítulo de gastos recoge el fondo de contingencia y otros imprevistos?",opts:["4","5","6","7"],c:1,f:"En gastos, el capítulo 5 es fondo de contingencia y otros imprevistos."},
+  {b:"Tema 7",q:"¿Qué capítulo de ingresos recoge la enajenación de inversiones reales?",opts:["5","6","7","8"],c:1,f:"Ingreso capítulo 6 = enajenación de inversiones reales."},
+  {b:"Tema 7",q:"¿Qué capítulo de gastos recoge las inversiones reales?",opts:["5","6","7","8"],c:1,f:"Gasto capítulo 6 = inversiones reales."},
+  {b:"Tema 7",q:"¿Qué capítulo de ingresos recoge las tasas, venta de bienes y otros ingresos?",opts:["2","3","4","5"],c:1,f:"El resumen asigna ese contenido al capítulo 3 de ingresos."},
+  {b:"Tema 7",q:"¿Qué capítulo de gastos recoge los bienes corrientes y servicios?",opts:["1","2","3","4"],c:1,f:"El capítulo 2 de gastos es bienes corrientes y servicios."},
+  {b:"Tema 7",q:"¿Qué capítulo de gastos recoge los gastos financieros?",opts:["2","3","8","9"],c:1,f:"Gastos financieros se ubican en el capítulo 3."},
+  {b:"Tema 7",q:"Ciclo presupuestario: elaboración",opts:["Control - elaboración - ejecución - aprobación - tramitación","Elaboración - tramitación parlamentaria - aprobación - ejecución - control","Aprobación - elaboración - control - ejecución - liquidación","Elaboración - aprobación - control - ejecución - tramitación"],c:2,f:"Universalidad significa incluir todos los ingresos y todos los gastos."},
+  {b:"Tema 7",q:"¿Cuál es el orden lógico del ciclo presupuestario según el resumen?",opts:["Control - elaboración - ejecución - aprobación - tramitación","Elaboración - tramitación parlamentaria - aprobación - ejecución - control","Aprobación - elaboración - control - ejecución - liquidación","Elaboración - aprobación - control - ejecución - tramitación"],c:1,f:"La página 6 fija ese orden lógico del ciclo presupuestario."},
+  {b:"Tema 7",q:"La primera fase del ciclo presupuestario es la:",opts:["Aprobación","Elaboración","Ejecución","Fiscalización externa"],c:1,f:"La fase inicial del ciclo es la elaboración."},
+  {b:"Tema 7",q:"Dentro de la fase de elaboración, el primer paso es:",opts:["Memorias de programa","Orden y calendario","Consolidaciones","Debate de totalidad"],c:1,f:"La tabla de elaboración empieza por orden y calendario."},
+  {b:"Tema 7",q:"¿Qué marcan las orientaciones presupuestarias?",opts:["Los recursos del control externo","Las prioridades y el marco general","La liquidación del ejercicio anterior","La clasificación económica por capítulos"],c:1,f:"El resumen atribuye a las orientaciones presupuestarias la fijación de prioridades y marco general."},
+  {b:"Tema 7",q:"¿Qué se define en el paso de estructuras presupuestarias?",opts:["Cómo clasificar ingresos y gastos","Cómo fiscalizar la ejecución","Cómo presentar enmiendas","Cómo prorrogar el presupuesto"],c:0,f:"Las estructuras presupuestarias determinan la clasificación de ingresos y gastos."},
+  {b:"Tema 7",q:"¿Qué remite cada ámbito en la fase de propuestas de ingresos y gastos?",opts:["Una auditoría externa","Su propuesta de ingresos y gastos","La liquidación definitiva","Un dictamen parlamentario"],c:1,f:"La tabla de elaboración lo expresa así."},
+  {b:"Tema 7",q:"Las memorias de programa sirven para:",opts:["Conectar recursos con objetivos e indicadores","Aprobar el presupuesto por ley","Emitir el control externo","Sustituir los anexos de personal"],c:0,f:"El resumen dice que conectan recursos con objetivos e indicadores."},
+  {b:"Tema 7",q:"¿Qué incluyen los anexos y consolidaciones mencionados en la fase de elaboración?",opts:["Personal, inversiones reales, ayudas y estados financieros, entre otros","Exclusivamente el debate de totalidad","Solo los ingresos tributarios","Únicamente el endeudamiento autorizado"],c:0,f:"Los anexos y consolidaciones comprenden esos elementos."},
+  {b:"Tema 7",q:"¿Qué secuencia-mnemotecnia propone el resumen para la elaboración?",opts:["Programas - órganos - capítulos - control - liquidación - prórroga","Orden - orientaciones - estructuras - propuestas - memorias - anexos","Ingresos - gastos - ejecución - control - comisión - aprobación","Intervención - Sindicatura - Parlament - Govern - anexos - liquidación"],c:1,f:"El “atajo TDAH” de la página 6 es exactamente esa secuencia."},
+  {b:"Tema 7",q:"¿Cuál de los siguientes elementos NO aparece en los espacios específicos de elaboración presupuestaria citados por el resumen?",opts:["Orden y calendario","Memorias","Anexo de inversiones reales","Sentencias judiciales firmes"],c:3,f:"El resumen cita orden, calendario, orientaciones, estructuras, memorias, anexos y consolidaciones; no sentencias."},
+  {b:"Tema 7",q:"¿Qué fase convierte la preparación técnica en un proceso político-legislativo?",opts:["La liquidación","La entrada del proyecto en el Parlament","La publicación de la ley ya aprobada","La actuación de la Intervención General"],c:1,f:"La página 7 señala que, una vez el Govern aprueba el proyecto, al entrar en el Parlament pasa a control político-legislativo."},
+  {b:"Tema 7",q:"¿Qué afirmación es correcta sobre la elaboración presupuestaria?",opts:["Es una tarea exclusiva del Parlament","Se produce después de la ejecución","Es la primera fase del ciclo y prepara técnica y documentalmente el proyecto","Sustituye el control posterior"],c:2,f:"La elaboración abre el ciclo y prepara técnica y documentalmente el proyecto."},
+  {b:"Tema 7",q:"¿Qué relación establece el resumen entre memorias de programa y resultados?",opts:["Ninguna, las memorias son solo contables","Las memorias vinculan recursos, objetivos e indicadores","Las memorias solo reflejan gasto de personal","Las memorias son parte del control externo"],c:1,f:"Ese vínculo aparece expresamente en la página 6."},
+  {b:"Tema 7",q:"El paso “propuestas de ingresos y gastos” implica que:",opts:["Cada ámbito remite su propuesta","El Parlament formula enmiendas","La Sindicatura aprueba el texto","Se liquida el ejercicio anterior"],c:0,f:"La fase de elaboración prevé remisión de propuestas por cada ámbito."},
+  {b:"Tema 7",q:"¿Cuál de estos pares está correctamente asociado?",opts:["Orientaciones presupuestarias - control externo","Estructuras presupuestarias - cómo clasificar ingresos y gastos","Memorias de programa - dictamen final del Parlament","Anexos y consolidaciones - debate de totalidad"],c:1,f:"La asociación correcta según la tabla es estructuras presupuestarias con clasificación de ingresos y gastos."},
+  {b:"Tema 7",q:"Tramitación parlamentaria, aprobación, prórroga y ejecución",opts:["La Sindicatura de Comptes","El Parlament","La Intervención General","El Consejo de Estado"],c:1,f:"La anualidad se define como vigencia limitada al ejercicio."},
+  {b:"Tema 7",q:"Una vez el Govern aprueba el proyecto de presupuestos, este entra en:",opts:["La Sindicatura de Comptes","El Parlament","La Intervención General","El Consejo de Estado"],c:1,f:"La página 7 señala que, aprobado el proyecto por el Govern, entra en el Parlament."},
+  {b:"Tema 7",q:"¿Cuál es el primer filtro político del proyecto en sede parlamentaria?",opts:["El dictamen final","Las comparecencias","El debate de totalidad","La publicación oficial"],c:2,f:"La tabla de tramitación identifica el debate de totalidad como primer filtro político."},
+  {b:"Tema 7",q:"Las comparecencias o el trabajo en comisión sirven para:",opts:["Sustituir la aprobación de la ley","Explicar los presupuestos y estudiar el proyecto en detalle","Ejecutar directamente las partidas","Fiscalizar externamente las cuentas"],c:1,f:"Así lo resume la página 7."},
+  {b:"Tema 7",q:"Las enmiendas parlamentarias pueden afectar:",opts:["Solo a los anexos de personal","Al articulado y a partidas","Solo a los ingresos financieros","Únicamente a los programas"],c:1,f:"La tabla indica que pueden afectar al articulado y a partidas."},
+  {b:"Tema 7",q:"¿Qué culmina con la votación del texto presupuestario?",opts:["La comparecencia","El control interno","El dictamen y debate final","La memoria de programa"],c:2,f:"La tabla de tramitación lo formula así."},
+  {b:"Tema 7",q:"¿Qué ocurre si el proyecto prospera en el Parlament?",opts:["Se remite a la Sindicatura para su aprobación","Se publica la Ley de presupuestos","Se convierte en reglamento del Govern","Se prorroga automáticamente el anterior"],c:1,f:"La aprobación culmina con la publicación de la Ley de presupuestos."},
+  {b:"Tema 7",q:"Si el 1 de enero no hay presupuesto aprobado, la regla general es:",opts:["Caduca todo el sistema presupuestario","Se prorroga automáticamente el presupuesto anterior en sus créditos iniciales, con ajustes procedentes","El Parlament asume la ejecución directa","Quedan suspendidos todos los gastos"],c:1,f:"La página 7 define así la prórroga."},
+  {b:"Tema 7",q:"La ejecución del presupuesto corresponde a:",opts:["El Parlament","El Govern y los órganos gestores","La Sindicatura de Comptes","La comisión parlamentaria competente"],c:1,f:"La ejecución corresponde al Govern y a los órganos gestores."},
+  {b:"Tema 7",q:"Durante la ejecución pueden existir modificaciones presupuestarias para:",opts:["Eliminar todo control parlamentario","Adaptar el presupuesto a necesidades sobrevenidas","Crear tributos nuevos","Sustituir la ley de presupuestos"],c:1,f:"El resumen menciona modificaciones para adaptarse a necesidades sobrevenidas."},
+  {b:"Tema 7",q:"¿Qué afirmación es correcta?",opts:["El Parlament ejecuta y el Govern aprueba","El Govern aprueba y el Parlament elabora","El Parlament aprueba y el Govern ejecuta","La Sindicatura aprueba y el Parlament controla"],c:2,f:"La página 7 y la trampa de examen insisten en esa distribución."},
+  {b:"Tema 7",q:"¿Qué confusión señala expresamente el resumen como trampa?",opts:["Confundir anualidad con universalidad","Confundir aprobación con ejecución","Confundir deuda con ingresos patrimoniales","Confundir programas con órganos"],c:1,f:"La página 7 dice que mezclar aprobación y ejecución es regalar puntos al tribunal."},
+  {b:"Tema 7",q:"¿Quién controla políticamente el presupuesto durante la fase parlamentaria?",opts:["La Intervención General","La Sindicatura de Comptes","El Parlament","Los órganos gestores"],c:2,f:"El Parlament ejerce el control político."},
+  {b:"Tema 7",q:"¿Cuál de estas secuencias parlamentarias es correcta?",opts:["Debate de totalidad - comparecencias/comisión - enmiendas - dictamen y debate final - aprobación","Enmiendas - aprobación - comparecencias - debate de totalidad - dictamen","Aprobación - comparecencias - ejecución - control - dictamen","Comparecencias - control interno - debate final - ejecución - publicación"],c:0,f:"La tabla de la página 7 recoge ese orden."},
+  {b:"Tema 7",q:"La prórroga automática del presupuesto anterior se refiere, según el resumen, a:",opts:["Todos los créditos modificados del ejercicio previo","Sus créditos iniciales, con ajustes legalmente procedentes","Solo a las inversiones reales","Solo a los créditos de personal"],c:1,f:"El resumen concreta la prórroga sobre créditos iniciales con ajustes procedentes."},
+  {b:"Tema 7",q:"Las modificaciones presupuestarias durante la ejecución demuestran que:",opts:["La ley aprobada nunca puede adaptarse","La ejecución puede requerir ajustes a necesidades sobrevenidas","El Govern puede gastar sin crédito","La Intervención asume funciones legislativas"],c:1,f:"La página 7 lo indica expresamente."},
+  {b:"Tema 7",q:"Documentación que acompaña a la Ley de presupuestos",opts:["Que la ley basta por sí sola y no necesita acompañamiento","Que el presupuesto moderno incorpora información complementaria, objetivos, seguimiento y transparencia","Que los anexos no tienen ninguna utilidad práctica","Que solo importan los estados de gasto"],c:1,f:"El resumen dice que es instrumento político porque traduce prioridades del Govern."},
+  {b:"Tema 7",q:"Según el resumen, junto a la ley de presupuestos existe un “ecosistema” documental. ¿Qué idea expresa mejor esta afirmación?",opts:["Que la ley basta por sí sola y no necesita acompañamiento","Que el presupuesto moderno incorpora información complementaria, objetivos, seguimiento y transparencia","Que los anexos no tienen ninguna utilidad práctica","Que solo importan los estados de gasto"],c:1,f:"La página 8 insiste en que el presupuesto moderno no va solo de crédito, sino también de información, objetivos, seguimiento y transparencia."},
+  {b:"Tema 7",q:"¿Para qué sirven los estados de ingresos y gastos?",opts:["Para detallar por clasificación económica, orgánica y por programas","Para sustituir las memorias de programa","Para aprobar las cuentas anuales","Para ejercer el control externo"],c:0,f:"La tabla de documentación atribuye esa función a los estados de ingresos y gastos."},
+  {b:"Tema 7",q:"Los resúmenes presupuestarios ofrecen:",opts:["Solo la clasificación por programas","Visión agregada por subsector, artículos y capítulos","El detalle de cada expediente de gasto","El régimen jurídico de la deuda"],c:1,f:"Así se describe la función de los resúmenes."},
+  {b:"Tema 7",q:"Las memorias de programa sirven para reflejar:",opts:["Diagnóstico, misión, objetivos, indicadores, gasto y personal","Solo la previsión de ingresos","Únicamente las modificaciones presupuestarias","La fiscalización externa"],c:0,f:"La tabla de la página 8 enumera exactamente esos elementos."},
+  {b:"Tema 7",q:"¿Para qué sirve el anexo de inversiones reales?",opts:["Para recoger los estados financieros del sector público","Para mostrar la distribución sectorial y territorial de los proyectos de inversión","Para detallar exclusivamente subvenciones corrientes","Para aprobar el endeudamiento"],c:1,f:"La tabla de documentación lo define así."},
+  {b:"Tema 7",q:"¿Qué información aporta el anexo de personal?",opts:["El control de legalidad del gasto","Plazas y costes de personal presupuestado","Las sentencias firmes sobre empleo público","Las transferencias de capital"],c:1,f:"El anexo de personal recoge plazas y costes de personal presupuestado."},
+  {b:"Tema 7",q:"¿Cuál de estos elementos se menciona como información complementaria relevante?",opts:["Ayudas, subvenciones, arrendamientos e inmuebles","Solo recursos contencioso-administrativos","Exclusivamente informes de auditoría privada","Únicamente deuda exterior"],c:0,f:"La página 8 lo incluye expresamente."},
+  {b:"Tema 7",q:"Los informes específicos citados por el resumen pueden referirse a:",opts:["Género, clima e informe económico-financiero, entre otros","Solo al control interno de la Intervención General","Únicamente al informe de la Sindicatura","Solo a la prórroga presupuestaria"],c:0,f:"La tabla menciona género, clima e informe económico-financiero."},
+  {b:"Tema 7",q:"La liquidación y la ejecución permiten:",opts:["Comparar lo previsto con lo realmente ejecutado","Sustituir la aprobación de la ley","Eliminar los controles posteriores","Convertir el presupuesto en reglamento"],c:0,f:"La tabla de la página 8 les atribuye esa función comparativa."},
+  {b:"Tema 7",q:"¿Cuál de estos documentos está vinculado de forma más directa a la distribución territorial de proyectos de inversión?",opts:["Resúmenes por capítulos","Anexo de inversiones reales","Memorias de programa","Informe de clima"],c:1,f:"La distribución sectorial y territorial de proyectos de inversión aparece en el anexo de inversiones reales."},
+  {b:"Tema 7",q:"¿Qué documento relaciona especialmente objetivos, indicadores, gasto y personal?",opts:["Estado de ingresos","Anexo de personal","Memoria de programa","Resumen agregado"],c:2,f:"La memoria de programa es el documento que reúne esos elementos."},
+  {b:"Tema 7",q:"¿Qué idea pretende reforzar el resumen con esta documentación adicional?",opts:["Que el presupuesto moderno no es solo autorización de crédito","Que el presupuesto moderno elimina los anexos","Que solo importan los capítulos económicos","Que la aprobación parlamentaria es innecesaria"],c:0,f:"La idea fuerza final de la página 8 es precisamente esa."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx];
+  document.getElementById('q-num-lbl').textContent=`Pregunta ${idx+1}`;
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog-num').textContent=`${idx+1} / ${pool.length}`;
+  document.getElementById('fill').style.width=`${((idx)/pool.length)*100}%`;
+  document.getElementById('v-pend').textContent=pool.length-(idx);
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((letter,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML=`<span class="letter">${letter}</span><span>${q.opts[i]}</span>`;
+    btn.onclick=()=>answer(i);
+    opts.appendChild(btn);
+  });
+  document.getElementById('feedback').className='';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+}
+
+function answer(sel){
+  if(answered)return;
+  answered=true;
+  const q=pool[idx];
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.c)b.classList.add('correct');
+    else if(i===sel)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='show '+(sel===q.c?'ok':'err');
+  fb.innerHTML=`<div class="fb-head">${sel===q.c?'Correcto':'Incorrecto'}</div><div class="fb-body">${q.f}</div>`;
+  document.getElementById('btn-next').style.display='block';
+  if(sel===q.c){nOk++;document.getElementById('v-ok').textContent=nOk;}
+  else{nErr++;document.getElementById('v-err').textContent=nErr;fallos.push({...q,userAns:sel});}
+}
+
+function nextQ(){idx++;render();}
+
+function showResults(){
+  document.getElementById('q-card').style.display='none';
+  document.getElementById('options').style.display='none';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-row').style.display='none';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('stats-row').style.display='none';
+  const pct=Math.round((nOk/pool.length)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  let msg='',sub='';
+  if(pct>=90){msg='Excelente dominio';sub='Estás listo para este bloque del tema.';}
+  else if(pct>=75){msg='Buen nivel';sub='Repasa los fallos y estarás a punto.';}
+  else if(pct>=60){msg='Nivel aceptable';sub='Refuerza los puntos débiles.';}
+  else{msg='Necesitas más estudio';sub='Revisa el tema y vuelve a intentarlo.';}
+  document.getElementById('res-title').textContent=msg;
+  document.getElementById('res-sub').textContent=sub;
+  if(fallos.length>0){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent=`Resumen de errores (${fallos.length})`;
+    document.getElementById('btn-fallos').style.display='inline-block';
+    const list=document.getElementById('fallos-list');
+    list.innerHTML='';
+    fallos.forEach(f=>{
+      const div=document.createElement('div');
+      div.className='fallo';
+      const letters=['A','B','C','D'];
+      div.innerHTML=`<div class="fallo-q">${f.q}</div><div class="fallo-badges"><span class="badge err">Tu respuesta: ${letters[f.userAns]}</span><span class="badge ok">Correcta: ${letters[f.c]}</span></div><div class="fallo-exp">${f.f}</div>`;
+      list.appendChild(div);
+    });
+  }else{
+    document.getElementById('btn-fallos').style.display='none';
+  }
+  document.getElementById('results').style.display='block';
+}
+
+function restart(){
+  pool=[...ALL_Q];
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+function soloFallos(){
+  if(fallos.length===0)return;
+  pool=fallos.map(f=>{const{userAns,...rest}=f;return rest;});
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('pill').textContent=`Solo fallos (${pool.length})`;
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+window.onload=()=>render();
+</script>
+</body>
+</html>

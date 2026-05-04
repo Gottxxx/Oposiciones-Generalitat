@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 7 Parte 1/3 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7f4; --surface: #ffffff; --surface2: #f1f0ed;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+    --ok: #1a7a4a; --ok-bg: #eaf5ee; --ok-border: rgba(26,122,74,0.25);
+    --err: #c0392b; --err-bg: #fdf0ee; --err-border: rgba(192,57,43,0.25);
+    --accent: #1a1a18; --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181a; --surface: #222224; --surface2: #2a2a2c;
+      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+      --text: #f0efec; --text2: #a0a09a; --text3: #606060;
+      --ok: #4caf7a; --ok-bg: rgba(76,175,122,0.12); --ok-border: rgba(76,175,122,0.3);
+      --err: #e57373; --err-bg: rgba(229,115,115,0.12); --err-border: rgba(229,115,115,0.3);
+      --accent: #f0efec;
+    }
+  }
+  html { font-size: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
+  #app { width: 100%; max-width: 680px; }
+  #header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  #header h1 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+  #header p { font-size: 13px; color: var(--text3); }
+  #pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-strong); color: var(--text2); background: var(--surface2); white-space: nowrap; flex-shrink: 0; }
+  #progress-wrap { margin-bottom: 1.25rem; }
+  #progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 7px; }
+  #progress-row span:last-child { font-weight: 500; color: var(--text2); }
+  #track { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  #fill { height: 3px; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+  #stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  #sc-ok .val { color: var(--ok); }
+  #sc-err .val { color: var(--err); }
+  #q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  #q-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #q-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); display: inline-block; }
+  #q-text { font-size: 16px; color: var(--text); line-height: 1.65; }
+  #options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; line-height: 1.55; transition: border-color 0.15s, background 0.15s, transform 0.1s; width: 100%; }
+  .opt:hover:not(.disabled) { border-color: var(--border-strong); background: var(--surface2); transform: translateY(-1px); }
+  .opt:active:not(.disabled) { transform: translateY(0); }
+  .letter { min-width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; margin-top: 1px; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
+  .opt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { border-color: var(--err-border); background: var(--err-bg); }
+  .opt.wrong .letter { background: var(--err); border-color: var(--err); color: #fff; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  #feedback { display: none; border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 1rem; border: 1px solid; font-size: 13px; line-height: 1.65; }
+  #feedback.show { display: block; }
+  #feedback.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+  #feedback.err { background: var(--err-bg); border-color: var(--err-border); }
+  #feedback .fb-head { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+  #feedback.ok .fb-head { color: var(--ok); }
+  #feedback.err .fb-head { color: var(--err); }
+  #feedback .fb-body { color: var(--text2); }
+  #btn-row { display: flex; justify-content: flex-end; }
+  #btn-next { display: none; font-size: 13px; font-weight: 500; padding: 10px 20px; border-radius: var(--radius-sm); background: var(--accent); color: var(--bg); border: none; cursor: pointer; transition: opacity 0.15s; }
+  #btn-next:hover { opacity: 0.85; }
+  #results { display: none; padding: 1rem 0; }
+  #res-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 2rem; }
+  #res-pct { font-size: 64px; font-weight: 700; color: var(--text); letter-spacing: -0.04em; line-height: 1; flex-shrink: 0; }
+  #res-info h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #res-info p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  #res-btns { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-sec { font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; transition: background 0.15s; }
+  .btn-sec:hover { background: var(--surface2); }
+  .btn-prim { background: var(--accent); color: var(--bg); border-color: transparent; }
+  .btn-prim:hover { opacity: 0.85; background: var(--accent); }
+  #fallos-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  #fallos-section h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .fallo { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .fallo:last-child { border-bottom: none; }
+  .fallo-q { font-size: 14px; color: var(--text); margin-bottom: 8px; line-height: 1.5; font-weight: 500; }
+  .fallo-badges { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .badge.err { background: var(--err-bg); border-color: var(--err-border); color: var(--err); }
+  .badge.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .fallo-exp { font-size: 12px; color: var(--text3); line-height: 1.6; }
+  @media (max-width: 500px) { body { padding: 1rem 0.75rem 3rem; } #res-hero { flex-direction: column; gap: 1rem; align-items: flex-start; } #res-pct { font-size: 48px; } #header { flex-direction: column; gap: 0.75rem; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <h1>Tema 7 Parte 1/3 · Oposición Generalitat</h1>
+      <p>62 preguntas · Presupuestos: concepto, rasgos y principios</p>
+    </div>
+    <div id="pill"></div>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-row"><span>Progreso</span><span id="prog-num">1 / 50</span></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">50</div></div>
+  </div>
+  <div id="q-card">
+    <div id="q-meta"><span id="q-num-lbl"></span><span class="dot"></span><span id="q-bloque-lbl"></span></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info"><h2 id="res-title"></h2><p id="res-sub"></p></div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_Q = [
+  {b:"Tema 7",q:"Concepto, rasgos y base jurídica",opts:["Una memoria plurianual de inversiones sin valor jurídico","La ley anual que ordena el gasto público y la previsión de ingresos del ejercicio","Un reglamento interno del Govern sobre contabilidad","Una cuenta de liquidación aprobada al final del ejercicio"],c:1,f:"El resumen lo define como la ley anual que ordena el gasto público y la previsión de ingresos del ejercicio."},
+  {b:"Tema 7",q:"¿Qué es, en esencia, el presupuesto de la Generalitat según el resumen?",opts:["Una memoria plurianual de inversiones sin valor jurídico","La ley anual que ordena el gasto público y la previsión de ingresos del ejercicio","Un reglamento interno del Govern sobre contabilidad","Una cuenta de liquidación aprobada al final del ejercicio"],c:1,f:"El resumen lo define como la ley anual que ordena el gasto público y la previsión de ingresos del ejercicio."},
+  {b:"Tema 7",q:"Según el art. 212 EAC, el presupuesto de la Generalitat tiene carácter:",opts:["Bienal y sectorial","Anual y único","Plurianual y descentralizado","Mensual y prorrogable"],c:1,f:"El art. 212 EAC se asocia en el resumen a un presupuesto anual y único."},
+  {b:"Tema 7",q:"¿Qué órgano elabora y ejecuta el presupuesto de la Generalitat?",opts:["El Parlament","La Sindicatura de Comptes","El Govern","La Intervención General del Estado"],c:2,f:"El resumen indica que el Govern elabora y ejecuta el presupuesto."},
+  {b:"Tema 7",q:"¿Qué órgano examina, enmienda, aprueba y controla el presupuesto?",opts:["La Intervención General","El Parlament","La Sindicatura de Comptes","El Tribunal Constitucional"],c:1,f:"El art. 212 EAC se resume diciendo que el Parlament examina, enmienda, aprueba y controla."},
+  {b:"Tema 7",q:"El rasgo de universalidad del presupuesto significa que:",opts:["Incluye solo los gastos de los departamentos centrales","Abarca únicamente ingresos tributarios","Incluye todos los ingresos y todos los gastos","Solo contiene créditos vinculantes de gasto"],c:2,f:"Universalidad significa incluir todos los ingresos y todos los gastos."},
+  {b:"Tema 7",q:"El rasgo de anualidad implica que el presupuesto:",opts:["Puede durar varios ejercicios si el Govern lo acuerda","Rige para un ejercicio presupuestario","Solo se liquida al final de la legislatura","Es válido hasta su sustitución expresa"],c:1,f:"La anualidad se define como vigencia limitada al ejercicio."},
+  {b:"Tema 7",q:"El presupuesto es un instrumento político porque:",opts:["Solo refleja datos contables ya cerrados","Traducce las prioridades del Govern","Sustituye a todas las demás leyes","Permite crear tributos automáticamente"],c:1,f:"El resumen dice que es instrumento político porque traduce prioridades del Govern."},
+  {b:"Tema 7",q:"El presupuesto es un instrumento jurídico porque:",opts:["No tiene efectos limitativos sobre el gasto","Autoriza y limita créditos","Equivale a un reglamento ejecutivo","Suprime el control parlamentario"],c:1,f:"Como instrumento jurídico, autoriza y limita créditos."},
+  {b:"Tema 7",q:"El presupuesto sirve como instrumento de control porque:",opts:["Permite fiscalizar la acción del ejecutivo","Elimina la necesidad de liquidación","Sustituye el control de la Sindicatura","Convierte todo gasto en libre disposición"],c:0,f:"El resumen lo vincula a la fiscalización de la acción del ejecutivo."},
+  {b:"Tema 7",q:"¿Cuál de estas afirmaciones es correcta sobre la ley de presupuestos?",opts:["Puede crear tributos por sí sola en cualquier caso","Nunca puede incidir en materia tributaria","Solo puede modificar tributos si una ley tributaria sustantiva lo permite","Puede suprimir tributos sin cobertura legal adicional"],c:2,f:"El resumen aclara que no crea tributos por sí sola y solo puede modificarlos si una ley sustantiva lo permite."},
+  {b:"Tema 7",q:"Según el resumen, el Estatuto conecta el presupuesto con:",opts:["Exclusivamente con la contratación pública","El endeudamiento y la estabilidad presupuestaria","La función pública y la potestad sancionadora","La jurisdicción contencioso-administrativa"],c:1,f:"Se indica expresamente la conexión con endeudamiento y estabilidad."},
+  {b:"Tema 7",q:"¿Para qué admite el Estatuto acudir al endeudamiento, dentro de los límites aplicables?",opts:["Para financiar exclusivamente gasto corriente","Para financiar inversiones","Para eludir el control parlamentario","Para crear créditos extraordinarios sin ley"],c:1,f:"El resumen indica que el endeudamiento puede servir para financiar inversiones dentro de los límites aplicables."},
+  {b:"Tema 7",q:"¿Qué afirmación refleja mejor el \"núcleo duro\" del tema según la página 1?",opts:["Basta con memorizar capítulos económicos","Hay que dominar concepto, estructura, ciclo y control","Lo esencial es conocer solo el control externo","La clave es la liquidación, no el presupuesto inicial"],c:1,f:"La página 1 resume el esqueleto en cuatro piezas: concepto, estructura, ciclo y control."},
+  {b:"Tema 7",q:"¿Cuál de estas expresiones recoge mejor la idea general del presupuesto?",opts:["Es un documento técnico sin dimensión política","Es el plan anual de ingresos y gastos con función jurídica y política","Es una previsión de caja sin valor legal","Es un informe de auditoría ex post"],c:1,f:"El resumen lo presenta como plan anual de ingresos y gastos con dimensión jurídico-política."},
+  {b:"Tema 7",q:"¿Qué rasgo significa que existe un presupuesto general y no uno aislado por cada órgano?",opts:["Universalidad","Anualidad","Unidad o presupuesto único","Especialidad"],c:2,f:"El rasgo de unicidad se explica como existencia de un presupuesto general."},
+  {b:"Tema 7",q:"Funciones y principios presupuestarios",opts:["Control","Gestión","Política económica","Jurisdicción"],c:1,f:"El art. 212 EAC se asocia en el resumen a un presupuesto anual y único."},
+  {b:"Tema 7",q:"¿Cuál NO es una de las tres funciones principales del presupuesto según el resumen?",opts:["Control","Gestión","Política económica","Jurisdicción"],c:3,f:"Las tres funciones citadas son control, gestión y política económica; jurisdicción no aparece."},
+  {b:"Tema 7",q:"La función de control del presupuesto permite:",opts:["Comprobar si cada órgano gestor usa correctamente los recursos públicos","Sustituir la aprobación parlamentaria","Transformar ingresos en tributos","Eliminar la necesidad de fiscalización"],c:0,f:"La tabla de funciones asocia control con comprobar el uso correcto de los recursos."},
+  {b:"Tema 7",q:"La función de gestión del presupuesto implica que este:",opts:["Solo sirve como documento histórico","Ordena importes, tiempos y naturaleza del gasto","Determina la constitucionalidad de las leyes","Se limita a clasificar ingresos"],c:1,f:"La función de gestión ordena importes, tiempos y naturaleza del gasto."},
+  {b:"Tema 7",q:"La función de política económica del presupuesto consiste en:",opts:["Asignar recursos, redistribuir renta y orientar la actividad pública","Aprobar reglamentos del Govern","Controlar la jurisdicción contable","Sustituir la planificación estratégica"],c:0,f:"Así se resume la función de política económica."},
+  {b:"Tema 7",q:"El principio de unidad presupuestaria significa:",opts:["Un solo presupuesto por ejercicio","Un solo capítulo de ingresos","Una sola memoria de programa","Una sola entidad gestora"],c:0,f:"Unidad = un solo presupuesto por ejercicio."},
+  {b:"Tema 7",q:"El principio de anualidad implica:",opts:["Vigencia limitada al ejercicio","Aplicación indefinida mientras no se derogue","Aprobación cada dos años","Liquidación trimestral obligatoria"],c:0,f:"El resumen define anualidad como vigencia limitada al ejercicio."},
+  {b:"Tema 7",q:"El principio de especialidad del crédito significa que:",opts:["Cualquier órgano puede gastar en cualquier fin","El crédito se aprueba para una finalidad concreta","Los ingresos quedan siempre afectados a un gasto específico","Todo crédito es ampliable libremente"],c:1,f:"Especialidad se explica como aprobación para una finalidad concreta, con importe y vigencia."},
+  {b:"Tema 7",q:"Según el resumen, el principio de no afectación de ingresos significa que:",opts:["Todos los ingresos deben destinarse a un mismo programa","Salvo excepción legal, los ingresos financian el conjunto de gastos","Cada ingreso financia siempre un gasto concreto","Los ingresos de capital solo financian personal"],c:1,f:"No afectación: salvo excepción legal, los ingresos financian el conjunto de gastos."},
+  {b:"Tema 7",q:"El principio de claridad presupuestaria exige que el presupuesto sea:",opts:["Comprensible y ordenado","Reservado y no publicable","Puramente económico y no jurídico","Inmodificable durante el ejercicio"],c:0,f:"Claridad se define como presupuesto comprensible y ordenado."},
+  {b:"Tema 7",q:"El marco actual exige atención al equilibrio y a la sostenibilidad financiera dentro del principio de:",opts:["Especialidad","Claridad","Equilibrio o estabilidad","No afectación"],c:2,f:"El resumen habla de equilibrio/estabilidad vinculados a sostenibilidad financiera."},
+  {b:"Tema 7",q:"¿Cuál de estas afirmaciones refleja correctamente la trampa del principio de especialidad?",opts:["Solo importa el órgano que gasta","Solo importa la cifra total anual","Importan finalidad, importe y vigencia, no solo el órgano","Se refiere únicamente a los ingresos"],c:2,f:"La trampa indicada es que especialidad no se limita al órgano: también atiende a finalidad, importe y vigencia."},
+  {b:"Tema 7",q:"¿Qué combinación es correcta?",opts:["Unidad = todos los ingresos y gastos; universalidad = un solo presupuesto","Unidad = un solo presupuesto; universalidad = inclusión de todos los ingresos y gastos","Unidad = vigencia anual; universalidad = finalidad concreta","Unidad = control externo; universalidad = control interno"],c:1,f:"Unidad y universalidad se diferencian exactamente así en el resumen."},
+  {b:"Tema 7",q:"¿Cuál de estos principios se relaciona mejor con evitar que se gaste “a capricho”?",opts:["Claridad","Especialidad","Anualidad","Unidad"],c:1,f:"Especialidad implica finalidad concreta del crédito y evita gastar al margen de ella."},
+  {b:"Tema 7",q:"¿Qué principio se vulneraría si el presupuesto excluyera ingresos o gastos del sector dependiente?",opts:["Claridad","Universalidad","Especialidad","Anualidad"],c:1,f:"Excluir ingresos o gastos chocaría con la universalidad."},
+  {b:"Tema 7",q:"¿Qué principio se relaciona con la existencia de un único presupuesto por ejercicio?",opts:["Unidad","No afectación","Claridad","Equilibrio"],c:0,f:"El resumen lo asocia directamente al principio de unidad."},
+  {b:"Tema 7",q:"Estructura del presupuesto",opts:["Jurídica, económica y territorial","Orgánica, por programas y económica","Funcional, política y contable","Orgánica, normativa y financiera"],c:2,f:"El resumen indica que el Govern elabora y ejecuta el presupuesto."},
+  {b:"Tema 7",q:"La triple estructura clásica del presupuesto de la Generalitat es:",opts:["Jurídica, económica y territorial","Orgánica, por programas y económica","Funcional, política y contable","Orgánica, normativa y financiera"],c:1,f:"La página 4 identifica la triple estructura como orgánica, por programas y económica."},
+  {b:"Tema 7",q:"La clasificación orgánica responde a la pregunta:",opts:["¿Para qué se gasta?","¿En qué se gasta?","¿Quién gestiona o gasta?","¿Con qué procedimiento se modifica?"],c:2,f:"Orgánica = quién gestiona o gasta."},
+  {b:"Tema 7",q:"La clasificación por programas responde a la pregunta:",opts:["¿Quién gestiona?","¿Para qué se gasta?","¿En qué se gasta?","¿Qué control se aplica?"],c:1,f:"Programas = para qué se gasta."},
+  {b:"Tema 7",q:"La clasificación económica informa sobre:",opts:["El órgano responsable y sus competencias","La finalidad del programa","La naturaleza del gasto o del ingreso","La estructura política del Govern"],c:2,f:"Económica = en qué se gasta o de dónde entra el dinero."},
+  {b:"Tema 7",q:"Un programa presupuestario es, según el resumen:",opts:["Una simple agrupación contable sin objetivos","Un conjunto de productos, servicios y actividades dirigidos a objetivos concretos","Un anexo sin valor para la ejecución","Una clasificación económica de los ingresos"],c:1,f:"Así se define el programa en la página 4."},
+  {b:"Tema 7",q:"La presupuestación orientada a resultados implica que:",opts:["Basta con agotar el crédito disponible","El gasto debe vincularse con objetivos e indicadores","La clasificación por programas sustituye a la económica","Desaparece el control del Parlament"],c:1,f:"El resumen insiste en gasto, objetivos e indicadores."},
+  {b:"Tema 7",q:"¿Qué suelen incluir las memorias de programa?",opts:["Solo el importe total del programa","Diagnóstico, misión, objetivos, indicadores, resumen económico y puestos de trabajo presupuestados","Exclusivamente el personal eventual","Solo la liquidación del ejercicio anterior"],c:1,f:"La página 4 enumera esos elementos de las memorias de programa."},
+  {b:"Tema 7",q:"¿Qué combinación es correcta?",opts:["Orgánica = naturaleza del gasto; programas = órgano responsable","Programas = finalidad; económica = naturaleza","Económica = objetivos; orgánica = capítulos","Programas = ingresos; económica = control"],c:1,f:"Programas se vincula a finalidad y económica a naturaleza del ingreso/gasto."},
+  {b:"Tema 7",q:"¿Cuál es la forma de recordatorio propuesta por el resumen?",opts:["Orgánica = en qué; programas = quién; económica = para qué","Orgánica = quién; programas = para qué; económica = en qué / con qué ingresos","Orgánica = control; programas = órganos; económica = objetivos","Orgánica = territorio; programas = plazo; económica = personal"],c:1,f:"La página 4 propone exactamente esa mnemotecnia."},
+  {b:"Tema 7",q:"Si una pregunta de examen te pide identificar el órgano responsable del gasto, la clasificación adecuada es la:",opts:["Económica","Orgánica","Por capítulos corrientes","De control interno"],c:1,f:"Orgánica responde a quién gestiona o gasta."},
+  {b:"Tema 7",q:"Si una pregunta pregunta por la finalidad del gasto, la clasificación adecuada es la:",opts:["Orgánica","Jurídica","Por programas","Contable"],c:2,f:"La finalidad corresponde a la clasificación por programas."},
+  {b:"Tema 7",q:"Si una pregunta pide la naturaleza económica del ingreso, la clasificación relevante es la:",opts:["Económica","Orgánica","Por objetivos","Por resultados"],c:0,f:"La clasificación económica informa de la naturaleza económica del ingreso o gasto."},
+  {b:"Tema 7",q:"¿Qué trampa típica menciona el resumen en relación con la estructura?",opts:["Confundir control político con control judicial","Confundir clasificación por programas con clasificación económica","Confundir ingresos financieros con personal","Confundir Sindicatura con Parlament"],c:1,f:"La página 1 identifica esta confusión como trampa típica."},
+  {b:"Tema 7",q:"Una memoria de programa NO se caracteriza por incluir:",opts:["Indicadores","Misión","Diagnóstico","Sentencias judiciales"],c:3,f:"El resumen menciona diagnóstico, misión, objetivos, indicadores, resumen económico y personal, no sentencias."},
+  {b:"Tema 7",q:"Cuando el resumen afirma que la documentación reciente insiste en la triple clasificación, quiere decir que permite saber:",opts:["Solo el capítulo económico","Órgano responsable, finalidad y naturaleza económica","Únicamente el importe total del presupuesto","La composición política del Parlament"],c:1,f:"La página 4 lo formula así."},
+  {b:"Tema 7",q:"Clasificación económica: capítulos de ingresos y gastos",opts:["Impuestos indirectos","Impuestos directos","Transferencias corrientes","Activos financieros"],c:1,f:"El art. 212 EAC se resume diciendo que el Parlament examina, enmienda, aprueba y controla."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 1 corresponde a:",opts:["Impuestos indirectos","Impuestos directos","Transferencias corrientes","Activos financieros"],c:1,f:"El capítulo 1 de ingresos es impuestos directos."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 2 corresponde a:",opts:["Impuestos indirectos","Impuestos directos","Ingresos patrimoniales","Pasivos financieros"],c:0,f:"El capítulo 2 de ingresos es impuestos indirectos."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 3 comprende:",opts:["Tasas, venta de bienes y otros ingresos","Transferencias de capital","Pasivos financieros","Inversiones reales"],c:0,f:"Así se recoge en la tabla de la página 5."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 4 corresponde a:",opts:["Activos financieros","Transferencias corrientes","Ingresos patrimoniales","Enajenación de inversiones reales"],c:1,f:"Capítulo 4 de ingresos = transferencias corrientes."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 5 corresponde a:",opts:["Ingresos patrimoniales","Gastos financieros","Transferencias de capital","Impuestos indirectos"],c:0,f:"Capítulo 5 de ingresos = ingresos patrimoniales."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 6 es:",opts:["Enajenación de inversiones reales","Inversiones reales","Activos financieros","Impuestos directos"],c:0,f:"Capítulo 6 de ingresos = enajenación de inversiones reales."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 7 corresponde a:",opts:["Transferencias corrientes","Transferencias de capital","Fondo de contingencia","Bienes corrientes y servicios"],c:1,f:"Capítulo 7 de ingresos = transferencias de capital."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 8 corresponde a:",opts:["Pasivos financieros","Activos financieros","Ingresos patrimoniales","Gastos financieros"],c:1,f:"Capítulo 8 de ingresos = activos financieros."},
+  {b:"Tema 7",q:"En la clasificación económica de ingresos, el capítulo 9 corresponde a:",opts:["Pasivos financieros","Transferencias corrientes","Impuestos directos","Tasas y otros ingresos"],c:0,f:"Capítulo 9 de ingresos = pasivos financieros."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 1 es:",opts:["Personal","Bienes corrientes y servicios","Gastos financieros","Inversiones reales"],c:0,f:"Capítulo 1 de gastos = personal."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 2 es:",opts:["Transferencias corrientes","Bienes corrientes y servicios","Activos financieros","Fondo de contingencia"],c:1,f:"Capítulo 2 de gastos = bienes corrientes y servicios."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 3 corresponde a:",opts:["Gastos financieros","Transferencias corrientes","Personal","Pasivos financieros"],c:0,f:"Capítulo 3 de gastos = gastos financieros."},
+  {b:"Tema 7",q:"En la clasificación económica de gastos, el capítulo 4 es:",opts:["Transferencias corrientes","Transferencias de capital","Gastos financieros","Pasivos financieros"],c:0,f:"Capítulo 4 de gastos = transferencias corrientes."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx];
+  document.getElementById('q-num-lbl').textContent=`Pregunta ${idx+1}`;
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog-num').textContent=`${idx+1} / ${pool.length}`;
+  document.getElementById('fill').style.width=`${((idx)/pool.length)*100}%`;
+  document.getElementById('v-pend').textContent=pool.length-(idx);
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((letter,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML=`<span class="letter">${letter}</span><span>${q.opts[i]}</span>`;
+    btn.onclick=()=>answer(i);
+    opts.appendChild(btn);
+  });
+  document.getElementById('feedback').className='';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+}
+
+function answer(sel){
+  if(answered)return;
+  answered=true;
+  const q=pool[idx];
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.c)b.classList.add('correct');
+    else if(i===sel)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='show '+(sel===q.c?'ok':'err');
+  fb.innerHTML=`<div class="fb-head">${sel===q.c?'Correcto':'Incorrecto'}</div><div class="fb-body">${q.f}</div>`;
+  document.getElementById('btn-next').style.display='block';
+  if(sel===q.c){nOk++;document.getElementById('v-ok').textContent=nOk;}
+  else{nErr++;document.getElementById('v-err').textContent=nErr;fallos.push({...q,userAns:sel});}
+}
+
+function nextQ(){idx++;render();}
+
+function showResults(){
+  document.getElementById('q-card').style.display='none';
+  document.getElementById('options').style.display='none';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-row').style.display='none';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('stats-row').style.display='none';
+  const pct=Math.round((nOk/pool.length)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  let msg='',sub='';
+  if(pct>=90){msg='Excelente dominio';sub='Estás listo para este bloque del tema.';}
+  else if(pct>=75){msg='Buen nivel';sub='Repasa los fallos y estarás a punto.';}
+  else if(pct>=60){msg='Nivel aceptable';sub='Refuerza los puntos débiles.';}
+  else{msg='Necesitas más estudio';sub='Revisa el tema y vuelve a intentarlo.';}
+  document.getElementById('res-title').textContent=msg;
+  document.getElementById('res-sub').textContent=sub;
+  if(fallos.length>0){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent=`Resumen de errores (${fallos.length})`;
+    document.getElementById('btn-fallos').style.display='inline-block';
+    const list=document.getElementById('fallos-list');
+    list.innerHTML='';
+    fallos.forEach(f=>{
+      const div=document.createElement('div');
+      div.className='fallo';
+      const letters=['A','B','C','D'];
+      div.innerHTML=`<div class="fallo-q">${f.q}</div><div class="fallo-badges"><span class="badge err">Tu respuesta: ${letters[f.userAns]}</span><span class="badge ok">Correcta: ${letters[f.c]}</span></div><div class="fallo-exp">${f.f}</div>`;
+      list.appendChild(div);
+    });
+  }else{
+    document.getElementById('btn-fallos').style.display='none';
+  }
+  document.getElementById('results').style.display='block';
+}
+
+function restart(){
+  pool=[...ALL_Q];
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+function soloFallos(){
+  if(fallos.length===0)return;
+  pool=fallos.map(f=>{const{userAns,...rest}=f;return rest;});
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('pill').textContent=`Solo fallos (${pool.length})`;
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+window.onload=()=>render();
+</script>
+</body>
+</html>

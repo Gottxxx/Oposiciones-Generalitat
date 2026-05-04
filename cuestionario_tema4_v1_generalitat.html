@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 4 · Test 1 · Oposición Generalitat</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8f7f4;--surface:#fff;--surface2:#f1f0ed;--border:rgba(0,0,0,.1);--border-strong:rgba(0,0,0,.2);--text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;--ok:#1a7a4a;--ok-bg:#eaf5ee;--ok-border:rgba(26,122,74,.25);--err:#c0392b;--err-bg:#fdf0ee;--err-border:rgba(192,57,43,.25);--accent:#1a1a18;--r:10px;--rs:6px}
+@media(prefers-color-scheme:dark){:root{--bg:#18181a;--surface:#222224;--surface2:#2a2a2c;--border:rgba(255,255,255,.1);--border-strong:rgba(255,255,255,.2);--text:#f0efec;--text2:#a0a09a;--text3:#606060;--ok:#4caf7a;--ok-bg:rgba(76,175,122,.12);--ok-border:rgba(76,175,122,.3);--err:#e57373;--err-bg:rgba(229,115,115,.12);--err-border:rgba(229,115,115,.3);--accent:#f0efec}}
+html{font-size:16px}body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 4rem}
+#app{width:100%;max-width:680px}
+#hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:2rem}
+#hdr h1{font-size:17px;font-weight:600;color:var(--text);margin-bottom:3px;letter-spacing:-.01em}#hdr p{font-size:13px;color:var(--text3)}
+#pill{font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border-strong);color:var(--text2);background:var(--surface2);white-space:nowrap;flex-shrink:0}
+#pw{margin-bottom:1.25rem}#pr{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:7px}#pr span:last-child{font-weight:500;color:var(--text2)}
+#track{height:3px;background:var(--surface2);border-radius:3px;overflow:hidden}#fill{height:3px;background:var(--accent);border-radius:3px;width:0%;transition:width .4s}
+#stats{display:flex;gap:1.5rem;margin-bottom:2rem;font-size:13px;color:var(--text2)}#stats span{display:flex;align-items:center;gap:5px}.dot{width:7px;height:7px;border-radius:50%;display:inline-block}.dot-ok{background:var(--ok)}.dot-er{background:var(--err)}
+#qc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;margin-bottom:1.5rem}
+#qm{font-size:11px;font-weight:500;color:var(--text3);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em}
+#qt{font-size:15px;line-height:1.55;font-weight:500;margin-bottom:1.5rem}
+#opts{display:flex;flex-direction:column;gap:8px}
+.opt{width:100%;text-align:left;padding:12px 16px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);font-size:14px;line-height:1.45;cursor:pointer;color:var(--text);font-family:inherit;transition:border-color .15s,background .15s}
+.opt:hover:not(.dis){border-color:var(--border-strong);background:var(--surface2)}
+.opt.ok{border-color:var(--ok-border);background:var(--ok-bg);color:var(--ok)}.opt.er{border-color:var(--err-border);background:var(--err-bg);color:var(--err)}.opt.dis{cursor:default;opacity:.5}
+#fb{margin-top:1rem;padding:14px 16px;border-radius:var(--rs);font-size:13px;line-height:1.55;display:none}
+#fb.ok{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok)}#fb.er{background:var(--err-bg);border:1px solid var(--err-border);color:var(--err)}
+#br{display:flex;gap:.75rem;margin-top:1.25rem}
+#bn{flex:1;padding:11px;border-radius:var(--rs);border:1px solid var(--border-strong);background:var(--surface2);font-size:13px;font-weight:500;cursor:pointer;color:var(--text);font-family:inherit;display:none}#bn:hover{background:var(--border)}
+#res{display:none}#rh{font-size:22px;font-weight:700;text-align:center;margin-bottom:.25rem}
+#rp{font-size:48px;font-weight:800;text-align:center;margin-bottom:.5rem}
+#ri{font-size:14px;text-align:center;color:var(--text2);margin-bottom:2rem}
+#rt{font-size:15px;font-weight:600;margin-bottom:1rem}
+#rs2{display:flex;gap:1rem;margin-bottom:2rem;justify-content:center}
+#rbt{display:flex;gap:.75rem;margin-bottom:2rem;justify-content:center;flex-wrap:wrap}
+#rbt button{padding:10px 24px;border-radius:var(--rs);border:1px solid var(--border-strong);background:var(--surface);font-size:13px;font-weight:500;cursor:pointer;color:var(--text);font-family:inherit}#rbt button:hover{background:var(--surface2)}
+#bfl{margin-top:.5rem}
+.fs{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:.75rem}
+.fst{font-size:13px;font-weight:500;margin-bottom:.5rem}
+.fst .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:500}
+.fst .badge-err{background:var(--err-bg);color:var(--err);border:1px solid var(--err-border)}.fst .badge-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)}
+.fl{font-size:13px;color:var(--text2);line-height:1.5}
+@media(max-width:500px){body{padding:1.25rem .75rem 3rem}#qc{padding:1.25rem}#hdr{flex-direction:column;gap:.5rem}#pill{align-self:flex-start}}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="hdr"><div><h1>Tema 4 · Protección de datos</h1><p>Test 1 — Conceptos base, categorías y principios</p></div><span id="pill">0 / 50</span></div>
+<div id="pw"><div id="pr"><span>Progreso</span><span id="pn">0%</span></div><div id="track"><div id="fill"></div></div></div>
+<div id="stats"><span><i class="dot dot-ok"></i> Correctas: <b id="sc-ok">0</b></span><span><i class="dot dot-er"></i> Incorrectas: <b id="sc-er">0</b></span></div>
+<div id="qc"><div id="qm"></div><div id="qt"></div><div id="opts"></div><div id="fb"></div><div id="br"><button id="bn" onclick="next()">Siguiente →</button></div></div>
+<div id="res"><div id="rh">Resultado</div><div id="rp"></div><div id="ri"></div><div id="rs2"></div><div id="rbt"><button onclick="restart()">Repetir completo</button><button onclick="retryFailed()">Solo falladas</button></div><div id="rt">Preguntas falladas</div><div id="bfl"></div></div>
+</div>
+<script>
+const Q=[
+{b:"Normativa y mapa del tema",q:"¿Qué norma constituye el marco general europeo de protección de datos?",opts:["Ley Orgánica 3/2018","Reglamento (UE) 2016/679 (RGPD)","Ley 19/2014","Ley 39/2015"],c:1,f:"El RGPD es el reglamento europeo directamente aplicable que establece el marco general de protección de datos en la UE."},
+{b:"Normativa y mapa del tema",q:"¿Qué ley adapta y completa en España el RGPD y añade derechos digitales?",opts:["Ley Orgánica 3/2018","Ley 26/2010","Ley 19/2013","Ley 40/2015"],c:0,f:"La LO 3/2018 (LOPDGDD) adapta el ordenamiento español al RGPD e incorpora el Título X de derechos digitales."},
+{b:"Normativa y mapa del tema",q:"¿Qué órgano busca la aplicación coherente del RGPD en toda la UE?",opts:["AEPD","Delegado de Protección de Datos","Comité Europeo de Protección de Datos","Tribunal de Justicia de la UE"],c:2,f:"El Comité Europeo de Protección de Datos (CEPD) garantiza la aplicación coherente del RGPD entre Estados miembros."},
+{b:"Normativa y mapa del tema",q:"¿Qué asociación normativa es correcta?",opts:["RGPD = solo España; LO 3/2018 = solo UE","RGPD = marco europeo; LO 3/2018 = adaptación española","RGPD = derechos digitales; LO 3/2018 = sanciones","RGPD = videovigilancia; LO 3/2018 = transferencias"],c:1,f:"El RGPD es la norma europea directamente aplicable; la LO 3/2018 la complementa y adapta al ordenamiento español."},
+{b:"Normativa y mapa del tema",q:"¿Qué norma debe asociarse al enunciado 'derechos digitales'?",opts:["LO 3/2018","RGPD únicamente","Código Civil","Ley 39/2015"],c:0,f:"El Título X de la LO 3/2018 regula específicamente los derechos digitales."},
+{b:"Normativa y mapa del tema",q:"¿Qué autoridades aparecen como referencia de control y tutela en materia de protección de datos?",opts:["Solo el Comité Europeo","Solo la Fiscalía","AEPD y autoridades autonómicas","Únicamente el Defensor del Pueblo"],c:2,f:"La AEPD es la autoridad de control estatal; existen también autoridades autonómicas (como la APDCAT en Catalunya)."},
+{b:"Concepto de dato personal",q:"¿Qué es un dato personal según el RGPD?",opts:["Solo la información íntima o secreta","Toda información sobre una persona física identificada o identificable","Solo datos especialmente protegidos","Únicamente nombre, DNI y domicilio"],c:1,f:"Dato personal = cualquier información relativa a persona física identificada o identificable. No se limita a datos íntimos."},
+{b:"Concepto de dato personal",q:"¿Qué idea corrige la trampa típica sobre dato personal?",opts:["Dato personal equivale siempre a dato íntimo","Solo lo sensible es dato personal","Basta con que identifique o haga identificable a una persona","Solo los datos escritos son datos personales"],c:2,f:"Trampa clásica: confundir dato personal con dato íntimo. Basta la identificabilidad."},
+{b:"Concepto de dato personal",q:"¿A quiénes protege en principio la normativa de protección de datos?",opts:["Personas fallecidas y jurídicas por igual","Personas físicas","Solo datos laborales","Solo datos de ciudadanos españoles"],c:1,f:"El RGPD protege datos de personas físicas, no de personas jurídicas ni, en principio, de fallecidos."},
+{b:"Concepto de dato personal",q:"¿Cuál de estas acciones encaja en 'tratar datos'?",opts:["Solo recogerlos","Solo suprimirlos","Recoger, registrar, conservar, consultar, usar, comunicar o suprimir","Exclusivamente cederlos a terceros"],c:2,f:"Tratamiento comprende cualquier operación sobre datos: desde la recogida hasta la supresión, pasando por consulta, cesión, etc."},
+{b:"Concepto de dato personal",q:"¿Cuál es un ejemplo de dato personal común?",opts:["Opinión política","Historial médico","Nombre y DNI","Huella dactilar para identificar unívocamente"],c:2,f:"Nombre y DNI son datos personales comunes. Las opiniones políticas y datos de salud son categorías especiales."},
+{b:"Concepto de dato personal",q:"La dirección IP, ¿puede ser dato personal?",opts:["Sí, cuando identifica a una persona física","No, nunca es dato personal","Solo si se combina con datos biométricos","Solo en redes públicas"],c:0,f:"La IP puede ser dato personal cuando permite identificar a la persona física titular de la conexión."},
+{b:"Concepto de dato personal",q:"La imagen y la voz, ¿son datos personales?",opts:["Nunca","Sí, cuando permiten identificar a una persona","Solo en grabaciones judiciales","Solo si se acompañan de nombre completo"],c:1,f:"Imagen y voz son datos personales cuando permiten identificar a una persona física."},
+{b:"Concepto de dato personal",q:"La matrícula de un vehículo asociada a una persona es:",opts:["Dato anónimo","Dato personal","Dato de categoría especial","Dato no protegido"],c:1,f:"La matrícula vinculada a una persona permite identificarla, por tanto es dato personal."},
+{b:"Categorías especiales",q:"¿Qué categoría corresponde al historial médico?",opts:["Dato común","Dato anónimo","Dato de salud, categoría especial","Dato meramente administrativo"],c:2,f:"Los datos de salud están incluidos en las categorías especiales del art. 9 RGPD."},
+{b:"Categorías especiales",q:"La huella dactilar usada para fichar, si identifica de forma unívoca, es:",opts:["Dato común","Dato biométrico y categoría especial","Dato agregado","Dato no protegido"],c:1,f:"Los datos biométricos dirigidos a identificar unívocamente a una persona son categoría especial."},
+{b:"Categorías especiales",q:"¿Cuál de estos datos NO es de categoría especial?",opts:["Origen étnico","Opiniones políticas","Aficiones culturales","Datos genéticos"],c:2,f:"Las aficiones culturales son dato personal común. Las categorías especiales incluyen: origen, opiniones políticas, religión, sindicación, genéticos, biométricos ID, salud, vida sexual."},
+{b:"Categorías especiales",q:"Los datos sobre condenas e infracciones penales tienen:",opts:["Tratamiento libre sin restricciones","Un régimen específico y reforzado","El mismo régimen que los datos comunes","Protección solo si el interesado lo solicita"],c:1,f:"Los datos penales e infracciones tienen un régimen específico y reforzado (art. 10 RGPD)."},
+{b:"Categorías especiales",q:"La religión o creencias de una persona es:",opts:["Dato común","Dato de categoría especial","Dato público no protegido","Dato que no puede tratarse en ningún caso"],c:1,f:"La religión forma parte de las categorías especiales del art. 9 RGPD."},
+{b:"Categorías especiales",q:"¿Qué regla general se aplica a las categorías especiales?",opts:["Pueden tratarse libremente con aviso previo","Su tratamiento está prohibido salvo excepciones tasadas","Solo requieren consentimiento verbal","Se tratan igual que cualquier otro dato"],c:1,f:"Art. 9 RGPD: prohibición general de tratamiento de categorías especiales, salvo excepciones (consentimiento explícito, interés vital, etc.)."},
+{b:"Principios del tratamiento",q:"¿Cuál es el primer principio que cita el RGPD en su art. 5?",opts:["Minimización de datos","Licitud, lealtad y transparencia","Limitación del plazo de conservación","Responsabilidad proactiva"],c:1,f:"Art. 5.1.a RGPD: los datos deben tratarse de manera lícita, leal y transparente."},
+{b:"Principios del tratamiento",q:"El principio de limitación de la finalidad implica que:",opts:["Los datos pueden usarse para cualquier fin posterior","Los datos se recogen para fines determinados, explícitos y legítimos","La finalidad la decide el encargado del tratamiento","Solo se aplica a datos de categorías especiales"],c:1,f:"Art. 5.1.b RGPD: los datos se recogen para fines determinados, explícitos y legítimos, sin tratamiento posterior incompatible."},
+{b:"Principios del tratamiento",q:"La minimización de datos significa que:",opts:["Hay que recoger todos los datos posibles por precaución","Los datos deben ser adecuados, pertinentes y limitados a lo necesario","Solo se aplica a datos electrónicos","Es un principio voluntario para el sector público"],c:1,f:"Art. 5.1.c RGPD: los datos serán adecuados, pertinentes y limitados a lo necesario para los fines del tratamiento."},
+{b:"Principios del tratamiento",q:"Si un formulario administrativo pide datos innecesarios para el trámite, ¿qué principio se vulnera?",opts:["Exactitud","Minimización de datos","Integridad","Limitación del plazo de conservación"],c:1,f:"Pedir de más vulnera la minimización: solo se deben recoger datos necesarios para la finalidad."},
+{b:"Principios del tratamiento",q:"El principio de exactitud exige que los datos sean:",opts:["Correctos y actualizados","Cifrados obligatoriamente","Públicos y accesibles","Irrevocables"],c:0,f:"Art. 5.1.d RGPD: los datos deben ser exactos y, si fuera necesario, actualizados."},
+{b:"Principios del tratamiento",q:"¿Qué prohíbe el principio de limitación del plazo de conservación?",opts:["Guardar datos durante el procedimiento","Conservar datos indefinidamente por comodidad","Destruir datos tras la finalidad","Archivar datos con fines de interés público"],c:1,f:"Art. 5.1.e RGPD: los datos no se conservan más tiempo del necesario para la finalidad; no se guardan indefinidamente."},
+{b:"Principios del tratamiento",q:"La integridad y confidencialidad como principio implica:",opts:["Publicar los datos para garantizar transparencia","Proteger los datos contra tratamiento no autorizado, pérdida o daño","Solo cifrar datos de categoría especial","Permitir acceso libre dentro de la Administración"],c:1,f:"Art. 5.1.f RGPD: seguridad adecuada, incluyendo protección contra tratamiento no autorizado o ilícito y contra pérdida, destrucción o daño accidental."},
+{b:"Principios del tratamiento",q:"La responsabilidad proactiva (accountability) significa que el responsable:",opts:["Puede afirmar el cumplimiento sin necesidad de demostrarlo","Debe poder acreditar y demostrar el cumplimiento del RGPD","Solo responde ante denuncia del interesado","Delega toda responsabilidad en el encargado"],c:1,f:"Art. 5.2 RGPD: el responsable debe ser capaz de demostrar el cumplimiento de los principios (accountability)."},
+{b:"Principios del tratamiento",q:"¿Qué mnemo resume los principios del RGPD?",opts:["LLTEM-MICA: licitud, lealtad, transparencia, exactitud, minimización — integridad, confidencialidad, accountability","ABCDE: acceso, borrado, cesión, denuncia, evaluación","SAFER: seguridad, acceso, finalidad, exactitud, responsabilidad","Ninguna de las anteriores"],c:0,f:"La regla mnemotécnica agrupa los 7 principios: Licitud-Lealtad-Transparencia, Limitación finalidad, Exactitud, Minimización, Limitación conservación, Integridad-Confidencialidad, Accountability."},
+{b:"Bases de legitimación",q:"¿Cuántas bases de legitimación para el tratamiento enumera el art. 6 RGPD?",opts:["4","6","8","3"],c:1,f:"Art. 6.1 RGPD enumera 6 bases: consentimiento, contrato, obligación legal, interés vital, interés público/ejercicio poderes públicos, interés legítimo."},
+{b:"Bases de legitimación",q:"Para la Administración pública, la base más habitual es:",opts:["El consentimiento del interesado","El cumplimiento de una misión de interés público o ejercicio de poderes públicos","El interés legítimo del responsable","La ejecución de un contrato con el interesado"],c:1,f:"Las AAPP suelen basar sus tratamientos en el cumplimiento de misión de interés público o ejercicio de poderes públicos (art. 6.1.e RGPD)."},
+{b:"Bases de legitimación",q:"¿Es el consentimiento la única base para tratar datos?",opts:["Sí, siempre es obligatorio","No, existen otras 5 bases de legitimación","Solo es necesario para datos comunes","El consentimiento no existe como base"],c:1,f:"Trampa típica: el consentimiento es UNA de las 6 bases. La Administración a menudo opera sin consentimiento, sobre base legal o interés público."},
+{b:"Bases de legitimación",q:"La base 'obligación legal' significa que:",opts:["El interesado está legalmente obligado a dar sus datos","El tratamiento es necesario para cumplir una obligación legal del responsable","Solo se aplica a datos de categoría especial","Requiere siempre consentimiento adicional"],c:1,f:"Art. 6.1.c RGPD: el tratamiento es necesario para el cumplimiento de una obligación legal aplicable al responsable."},
+{b:"Bases de legitimación",q:"El interés legítimo como base de tratamiento:",opts:["Puede invocarlo la Administración pública sin restricciones","No puede ser invocado por autoridades públicas en el ejercicio de sus funciones","Es la base principal del sector público","Solo se aplica a datos de empleados"],c:1,f:"Art. 6.1 in fine RGPD: la base de interés legítimo no se aplica al tratamiento realizado por autoridades públicas en el ejercicio de sus funciones."},
+{b:"Consentimiento",q:"¿Cómo debe ser el consentimiento según el RGPD?",opts:["Tácito o presunto por defecto","Libre, específico, informado e inequívoco","Solo verbal, nunca escrito","Implícito por el mero uso del servicio"],c:1,f:"Art. 4.11 y 7 RGPD: el consentimiento debe ser libre, específico, informado e inequívoco, mediante declaración o acción afirmativa clara."},
+{b:"Consentimiento",q:"Para datos de categoría especial, el consentimiento debe ser además:",opts:["Verbal","Explícito","Tácito","Presunto"],c:1,f:"Art. 9.2.a RGPD: para categorías especiales se requiere consentimiento explícito (nivel superior al inequívoco)."},
+{b:"Consentimiento",q:"¿Puede retirarse el consentimiento una vez dado?",opts:["No, es irrevocable","Sí, en cualquier momento y tan fácil como fue darlo","Solo mediante solicitud judicial","Solo si han pasado más de 30 días"],c:1,f:"Art. 7.3 RGPD: el interesado tiene derecho a retirar su consentimiento en cualquier momento, y debe ser tan fácil retirarlo como darlo."},
+{b:"Consentimiento",q:"El silencio del interesado, ¿equivale a consentimiento?",opts:["Sí, el silencio es consentimiento tácito","No, el silencio no constituye consentimiento","Solo en procedimientos administrativos","Depende de la normativa autonómica"],c:1,f:"Considerando 32 RGPD: el silencio, las casillas premarcadas o la inacción no constituyen consentimiento."},
+{b:"Consentimiento",q:"Las casillas premarcadas en un formulario electrónico:",opts:["Son válidas como consentimiento","No constituyen consentimiento válido","Solo son válidas para datos comunes","Son válidas si el responsable avisa previamente"],c:1,f:"El RGPD exige acción afirmativa clara: las casillas premarcadas no cumplen este requisito."},
+{b:"Deber de información",q:"¿Cuándo debe informarse al interesado sobre el tratamiento de sus datos?",opts:["Solo cuando lo solicite expresamente","En el momento de la recogida de los datos","Después de completar el tratamiento","Solo si hay cesión a terceros"],c:1,f:"Arts. 13-14 RGPD: la información debe proporcionarse en el momento de recogida de los datos (o en plazo razonable si no se obtienen del interesado)."},
+{b:"Deber de información",q:"¿Qué información mínima debe proporcionarse al interesado?",opts:["Solo el nombre del responsable","Identidad del responsable, finalidad, base jurídica, destinatarios, plazos de conservación, derechos del interesado","Solo la finalidad del tratamiento","Solo los derechos del interesado"],c:1,f:"Arts. 13-14 RGPD exigen informar sobre: identidad responsable, finalidad, base jurídica, destinatarios, plazos, derechos, existencia de decisiones automatizadas, etc."},
+{b:"Deber de información",q:"La información debe proporcionarse de forma:",opts:["Técnica y en lenguaje jurídico especializado","Concisa, transparente, inteligible y de fácil acceso","Resumida en un único párrafo sin detalles","Verbal y sin soporte escrito"],c:1,f:"Art. 12 RGPD: la información se facilita de forma concisa, transparente, inteligible y de fácil acceso, con lenguaje claro y sencillo."},
+{b:"Deber de información",q:"Si los datos no se obtienen directamente del interesado, la información debe darse:",opts:["Nunca","En un plazo razonable, máximo un mes desde la obtención","Solo si el interesado lo solicita","Al finalizar el tratamiento"],c:1,f:"Art. 14.3 RGPD: cuando los datos no se obtienen del interesado, la información se proporciona en plazo razonable (máximo un mes)."},
+{b:"Deber de información",q:"La LO 3/2018 permite un sistema de información por capas. ¿Qué significa?",opts:["Se informa en varias sesiones presenciales","Se presenta una primera capa básica con los datos esenciales y un enlace a la información completa","Se informa solo a los responsables jerárquicos","Se envía la información por correo postal"],c:1,f:"La LOPDGDD permite informar en dos capas: una básica (identidad, finalidad, derechos, enlace) y otra con toda la información detallada."},
+{b:"Figuras clave",q:"¿Quién es el responsable del tratamiento?",opts:["Quien trata datos por cuenta del responsable","Quien determina los fines y medios del tratamiento","El interesado cuyos datos se tratan","El DPD"],c:1,f:"Art. 4.7 RGPD: responsable = persona/entidad que determina los fines y medios del tratamiento de datos personales."},
+{b:"Figuras clave",q:"¿Quién es el encargado del tratamiento?",opts:["Quien trata datos personales por cuenta del responsable","Quien decide los fines del tratamiento","La autoridad de control","El interesado"],c:0,f:"Art. 4.8 RGPD: encargado = quien trata datos personales por cuenta del responsable del tratamiento."},
+{b:"Figuras clave",q:"La relación entre responsable y encargado debe formalizarse:",opts:["Solo verbalmente","Mediante contrato u otro acto jurídico vinculante","Solo con autorización judicial","No requiere formalización"],c:1,f:"Art. 28 RGPD: el tratamiento por el encargado se rige por contrato u otro acto jurídico que establezca las condiciones del tratamiento."},
+{b:"Figuras clave",q:"El Delegado de Protección de Datos (DPD) es obligatorio para:",opts:["Solo empresas privadas con más de 250 empleados","Autoridades y organismos públicos, entre otros supuestos","Solo cuando lo solicite la AEPD","Nunca es obligatorio, siempre es voluntario"],c:1,f:"Art. 37 RGPD: el DPD es obligatorio para autoridades/organismos públicos, tratamientos a gran escala de categorías especiales, y observación sistemática a gran escala."},
+{b:"Figuras clave",q:"El DPD tiene como función principal:",opts:["Imponer sanciones al responsable","Informar, asesorar, supervisar el cumplimiento y actuar como punto de contacto con la autoridad de control","Sustituir al responsable en todas sus decisiones","Aprobar los tratamientos de datos"],c:1,f:"Art. 39 RGPD: el DPD informa, asesora, supervisa cumplimiento, coopera con la autoridad de control y actúa como punto de contacto."},
+{b:"Figuras clave",q:"¿Puede el DPD ser sancionado por las decisiones del responsable?",opts:["Sí, es corresponsable","No, el DPD no es responsable del incumplimiento del responsable","Solo en caso de negligencia grave","Depende de su contrato"],c:1,f:"El DPD asesora y supervisa, pero la responsabilidad del cumplimiento recae en el responsable del tratamiento."},
+{b:"Autoridades de control",q:"La AEPD es:",opts:["Una empresa privada de certificación","La autoridad de control independiente del Estado en materia de protección de datos","Un órgano consultivo del Congreso","Una delegación del Comité Europeo"],c:1,f:"La AEPD (Agencia Española de Protección de Datos) es la autoridad de control independiente estatal prevista por el RGPD y la LOPDGDD."},
+{b:"Autoridades de control",q:"En Catalunya, ¿existe autoridad autonómica de protección de datos?",opts:["No, solo existe la AEPD","Sí, la Autoritat Catalana de Protecció de Dades (APDCAT)","Solo para datos de salud","Solo para el sector privado catalán"],c:1,f:"La APDCAT es la autoridad catalana de protección de datos, competente sobre ficheros públicos de la Generalitat y entes locales catalanes."}
+];
+let idx=0,ok=0,er=0,fails=[],cur=Q.slice(),full=Q.slice();
+function render(){
+if(idx>=cur.length){showRes();return}
+let q=cur[idx],t=cur.length;
+document.getElementById('pill').textContent=idx+'/'+t;
+document.getElementById('pn').textContent=Math.round(idx/t*100)+'%';
+document.getElementById('fill').style.width=Math.round(idx/t*100)+'%';
+document.getElementById('sc-ok').textContent=ok;
+document.getElementById('sc-er').textContent=er;
+document.getElementById('qm').textContent=q.b;
+document.getElementById('qt').textContent=q.q;
+let h='';q.opts.forEach((o,i)=>{h+='<button class="opt" onclick="pick('+i+')">'+o+'</button>'});
+document.getElementById('opts').innerHTML=h;
+document.getElementById('fb').style.display='none';
+document.getElementById('fb').className='';
+document.getElementById('bn').style.display='none';
+}
+function pick(i){
+let q=cur[idx],bs=document.querySelectorAll('.opt');
+bs.forEach((b,j)=>{b.classList.add('dis');b.onclick=null;if(j===q.c)b.classList.add('ok');if(j===i&&i!==q.c)b.classList.add('er')});
+let fb=document.getElementById('fb');
+if(i===q.c){ok++;fb.className='ok';fb.textContent='✓ '+q.f}else{er++;fb.className='er';fb.textContent='✗ '+q.f;fails.push({...q,pick:i})}
+fb.style.display='block';document.getElementById('bn').style.display='block';
+document.getElementById('sc-ok').textContent=ok;document.getElementById('sc-er').textContent=er;
+}
+function next(){idx++;render()}
+function showRes(){
+document.getElementById('qc').style.display='none';
+document.getElementById('pw').style.display='none';
+document.getElementById('stats').style.display='none';
+let r=document.getElementById('res');r.style.display='block';
+let pct=Math.round(ok/(ok+er)*100)||0;
+document.getElementById('rp').textContent=pct+'%';
+document.getElementById('rp').style.color=pct>=70?'var(--ok)':'var(--err)';
+document.getElementById('ri').textContent=ok+' correctas · '+er+' incorrectas · '+cur.length+' preguntas';
+document.getElementById('pill').textContent=cur.length+'/'+cur.length;
+document.getElementById('fill').style.width='100%';
+let fl=document.getElementById('bfl');fl.innerHTML='';
+if(fails.length===0){document.getElementById('rt').textContent='¡Sin fallos!';return}
+fails.forEach(f=>{
+let d=document.createElement('div');d.className='fs';
+let opts='ABCD';
+d.innerHTML='<div class="fst">'+f.q+' <span class="badge badge-err">Tu: '+opts[f.pick]+'</span><span class="badge badge-ok">OK: '+opts[f.c]+'</span></div><div class="fl">'+f.f+'</div>';
+fl.appendChild(d)});
+}
+function restart(){idx=0;ok=0;er=0;fails=[];cur=full.slice();document.getElementById('qc').style.display='';document.getElementById('pw').style.display='';document.getElementById('stats').style.display='';document.getElementById('res').style.display='none';render()}
+function retryFailed(){if(fails.length===0)return;cur=fails.slice();idx=0;ok=0;er=0;fails=[];document.getElementById('qc').style.display='';document.getElementById('pw').style.display='';document.getElementById('stats').style.display='';document.getElementById('res').style.display='none';render()}
+render();
+</script>
+</body>
+</html>
