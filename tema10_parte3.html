@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 10 Parte 3/3 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7f4; --surface: #ffffff; --surface2: #f1f0ed;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+    --ok: #1a7a4a; --ok-bg: #eaf5ee; --ok-border: rgba(26,122,74,0.25);
+    --err: #c0392b; --err-bg: #fdf0ee; --err-border: rgba(192,57,43,0.25);
+    --accent: #1a1a18; --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181a; --surface: #222224; --surface2: #2a2a2c;
+      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+      --text: #f0efec; --text2: #a0a09a; --text3: #606060;
+      --ok: #4caf7a; --ok-bg: rgba(76,175,122,0.12); --ok-border: rgba(76,175,122,0.3);
+      --err: #e57373; --err-bg: rgba(229,115,115,0.12); --err-border: rgba(229,115,115,0.3);
+      --accent: #f0efec;
+    }
+  }
+  html { font-size: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
+  #app { width: 100%; max-width: 680px; }
+  #header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  #header h1 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+  #header p { font-size: 13px; color: var(--text3); }
+  #pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-strong); color: var(--text2); background: var(--surface2); white-space: nowrap; flex-shrink: 0; }
+  #progress-wrap { margin-bottom: 1.25rem; }
+  #progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 7px; }
+  #progress-row span:last-child { font-weight: 500; color: var(--text2); }
+  #track { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  #fill { height: 3px; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+  #stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  #sc-ok .val { color: var(--ok); }
+  #sc-err .val { color: var(--err); }
+  #q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  #q-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #q-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); display: inline-block; }
+  #q-text { font-size: 16px; color: var(--text); line-height: 1.65; }
+  #options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; line-height: 1.55; transition: border-color 0.15s, background 0.15s, transform 0.1s; width: 100%; }
+  .opt:hover:not(.disabled) { border-color: var(--border-strong); background: var(--surface2); transform: translateY(-1px); }
+  .opt:active:not(.disabled) { transform: translateY(0); }
+  .letter { min-width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; margin-top: 1px; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
+  .opt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { border-color: var(--err-border); background: var(--err-bg); }
+  .opt.wrong .letter { background: var(--err); border-color: var(--err); color: #fff; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  #feedback { display: none; border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 1rem; border: 1px solid; font-size: 13px; line-height: 1.65; }
+  #feedback.show { display: block; }
+  #feedback.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+  #feedback.err { background: var(--err-bg); border-color: var(--err-border); }
+  #feedback .fb-head { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+  #feedback.ok .fb-head { color: var(--ok); }
+  #feedback.err .fb-head { color: var(--err); }
+  #feedback .fb-body { color: var(--text2); }
+  #btn-row { display: flex; justify-content: flex-end; }
+  #btn-next { display: none; font-size: 13px; font-weight: 500; padding: 10px 20px; border-radius: var(--radius-sm); background: var(--accent); color: var(--bg); border: none; cursor: pointer; transition: opacity 0.15s; }
+  #btn-next:hover { opacity: 0.85; }
+  #results { display: none; padding: 1rem 0; }
+  #res-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 2rem; }
+  #res-pct { font-size: 64px; font-weight: 700; color: var(--text); letter-spacing: -0.04em; line-height: 1; flex-shrink: 0; }
+  #res-info h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #res-info p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  #res-btns { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-sec { font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; transition: background 0.15s; }
+  .btn-sec:hover { background: var(--surface2); }
+  .btn-prim { background: var(--accent); color: var(--bg); border-color: transparent; }
+  .btn-prim:hover { opacity: 0.85; background: var(--accent); }
+  #fallos-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  #fallos-section h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .fallo { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .fallo:last-child { border-bottom: none; }
+  .fallo-q { font-size: 14px; color: var(--text); margin-bottom: 8px; line-height: 1.5; font-weight: 500; }
+  .fallo-badges { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .badge.err { background: var(--err-bg); border-color: var(--err-border); color: var(--err); }
+  .badge.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .fallo-exp { font-size: 12px; color: var(--text3); line-height: 1.6; }
+  @media (max-width: 500px) { body { padding: 1rem 0.75rem 3rem; } #res-hero { flex-direction: column; gap: 1rem; align-items: flex-start; } #res-pct { font-size: 48px; } #header { flex-direction: column; gap: 0.75rem; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <h1>Tema 10 Parte 3/3 · Oposición Generalitat</h1>
+      <p>63 preguntas · Copias auténticas · Registro · Red de apoyo · Comparativas</p>
+    </div>
+    <div id="pill"></div>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-row"><span>Progreso</span><span id="prog-num">1 / 63</span></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">63</div></div>
+  </div>
+  <div id="q-card">
+    <div id="q-meta"><span id="q-num-lbl"></span><span class="dot"></span><span id="q-bloque-lbl"></span></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info"><h2 id="res-title"></h2><p id="res-sub"></p></div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_Q = [
+  {b:"Documentos y copias auténticas",q:"La copia auténtica tiene la misma validez y eficacia que el original si:",opts:["La emite órgano competente y se garantiza identidad del órgano y del contenido","Se obtiene mediante simple escaneo","La solicita verbalmente el interesado","Se incorpora después al archivo electrónico"],c:0,f:"Competencia y garantías formales son esenciales para la copia auténtica."},
+  {b:"Documentos y copias auténticas",q:"¿Quién puede expedir copias auténticas?",opts:["Solo el titular del órgano","Personal funcionario habilitado o una actuación administrativa automatizada","Cualquier persona empleada pública","Solo una notaría"],c:1,f:"El tema admite ambas posibilidades."},
+  {b:"Documentos y copias auténticas",q:"La copia en papel de un documento electrónico debe:",opts:["Reflejar su condición e incorporar código o sistema de verificación","Carecer de cualquier referencia al original","Tener siempre firma manuscrita","Emitirse necesariamente en 24 horas"],c:0,f:"Ese es el requisito que recuerda el resumen."},
+  {b:"Documentos y copias auténticas",q:"La expedición de copias auténticas solicitadas por la persona interesada debe realizarse, con carácter general, en:",opts:["5 días","10 días","15 días","30 días"],c:2,f:"El tema fija con carácter general 15 días desde la solicitud."},
+  {b:"Documentos y copias auténticas",q:"La trampa clásica sobre las copias auténticas es pensar que:",opts:["Escanear un papel convierte por sí solo el archivo en copia auténtica","Exigen órgano competente y garantías formales","Pueden emitirse por actuación automatizada","La copia auténtica equivale al original si cumple requisitos"],c:0,f:"El resumen señala expresamente esa confusión."},
+  {b:"Documentos y copias auténticas",q:"La Administración no debe exigir originales salvo:",opts:["Que lo prefiera el órgano gestor","Excepción legal","Que el ciudadano sea persona jurídica","Que exista sede asociada"],c:1,f:"La regla general del tema es no exigir originales salvo excepción legal."},
+  {b:"Documentos y copias auténticas",q:"Tampoco debe pedir documentos ya aportados a otra Administración si:",opts:["Puede obtenerlos electrónicamente","Han transcurrido menos de cinco años","La persona interesada lo solicita oralmente","Se trata de documentos en papel"],c:0,f:"Es una de las reglas prácticas destacadas en la página 8."},
+  {b:"Documentos y copias auténticas",q:"Las personas interesadas pueden aportar:",opts:["Solo los documentos exigidos por la normativa","Los exigidos por la normativa o los que estimen convenientes para defender sus derechos e intereses","Únicamente escritos de alegaciones","Solo documentos electrónicos autenticados por fedatario"],c:1,f:"El tema admite ambos tipos de aportación documental."},
+  {b:"Documentos y copias auténticas",q:"¿Cuál de estas afirmaciones es correcta?",opts:["Toda digitalización de un papel genera automáticamente copia auténtica","La copia auténtica exige órgano competente y garantías de identidad y contenido","Las copias auténticas no pueden emitirse automáticamente","La expedición solicitada por el interesado carece de plazo general"],c:1,f:"Resume la regla central del tema."},
+  {b:"Documentos y copias auténticas",q:"Señala la opción incorrecta:",opts:["El documento electrónico debe poder identificarse y tratarse de forma diferenciada","La copia auténtica puede emitirla personal funcionario habilitado","La Administración puede exigir originales siempre que lo considere conveniente","La persona interesada puede aportar documentos que estime convenientes"],c:2,f:"La exigencia de originales es excepcional, no discrecional."},
+  {b:"Documentos y copias auténticas",q:"En el tema, el plazo de 15 días se refiere a:",opts:["La vigencia de la sede asociada","La expedición general de copias auténticas solicitadas por la persona interesada","La subsanación de apoderamientos","La respuesta a notificaciones electrónicas"],c:1,f:"Ese plazo aparece ligado a la expedición de copias auténticas."},
+  {b:"Documentos y copias auténticas",q:"La copia auténtica equivale al original cuando concurre:",opts:["Solo identidad del contenido","Solo emisión automatizada","Competencia del órgano y garantías de identidad y contenido","Simple reproducción digital"],c:2,f:"Necesita competencia y garantías formales suficientes."},
+  {b:"Documentos y copias auténticas",q:"¿Qué requisito no se menciona para el documento electrónico?",opts:["Referencia temporal","Posibilidad de verificar autenticidad e integridad","Tratamiento diferenciado","Firma manuscrita obligatoria en todo caso"],c:3,f:"La firma manuscrita no es un requisito general del documento electrónico."},
+  {b:"Documentos y copias auténticas",q:"La idea 'escanear no basta' se refiere a:",opts:["El archivo electrónico","La sede electrónica","La copia auténtica","La interoperabilidad técnica"],c:2,f:"La mera digitalización no convierte el archivo en copia auténtica."},
+  {b:"Documentos y copias auténticas",q:"Cuando se dice que el documento debe conservarse con autenticidad, integridad y acceso, se está aludiendo a:",opts:["Los requisitos del documento electrónico","El contenido mínimo del PACe","La representación apud acta","Las categorías del ENS"],c:0,f:"Forma parte de los requisitos del documento electrónico."},
+  {b:"Registro y tramesa",q:"El registro de entrada deja constancia de:",opts:["Fecha y hora, asiento, identificación del remitente y referencia del documento o trámite","Solo el órgano competente","Exclusivamente la firma del ciudadano","La identidad del funcionario que digitaliza"],c:0,f:"Es la información registral básica citada en el tema."},
+  {b:"Registro y tramesa",q:"La documentación presentada presencialmente:",opts:["Nunca debe digitalizarse","Puede requerir digitalización para integrarse en la tramitación electrónica","Debe destruirse tras su escaneo","Siempre se convierte en copia auténtica"],c:1,f:"El tema señala esa posibilidad operativa."},
+  {b:"Registro y tramesa",q:"No todo debe digitalizarse si:",opts:["El formato o soporte lo impide o la naturaleza del documento lo desaconseja","El ciudadano es persona física","El trámite no tiene plazo","Se presenta en sede asociada"],c:0,f:"El resumen contempla esos supuestos específicos."},
+  {b:"Registro y tramesa",q:"Para intercambios y registros entre administraciones públicas catalanas, el tema menciona:",opts:["SIR","VALid","EACAT","e-Notum"],c:2,f:"EACAT aparece como herramienta del ámbito catalán."},
+  {b:"Registro y tramesa",q:"Con administraciones fuera de Cataluña se usa:",opts:["EACAT","SIR","idCAT-SMS","PACe"],c:1,f:"El resumen asigna SIR a los intercambios con administraciones de fuera de Cataluña."},
+  {b:"Registro y tramesa",q:"En la práctica de oficina, cuando una tramesa va por SIR conviene:",opts:["Ignorar su estado una vez enviada","Vigilar que el estado quede correctamente confirmado","Duplicar el envío por correo ordinario","Pedir al ciudadano que la reitere"],c:1,f:"Es una pauta práctica que menciona expresamente el tema."},
+  {b:"Registro y tramesa",q:"Entrada, en sentido registral, significa que:",opts:["La Administración notifica al ciudadano","El documento entra al circuito administrativo","Se expide una copia auténtica","Se archiva definitivamente el expediente"],c:1,f:"Es la explicación práctica que aparece en la página 8."},
+  {b:"Registro y tramesa",q:"Salida, en sentido registral, significa que:",opts:["La Administración emite o dirige comunicaciones o documentos hacia fuera","La persona interesada retira un certificado","Se elimina el asiento del registro","Se digitaliza un documento presencial"],c:0,f:"Ese es el sentido de 'salida' en el tema."},
+  {b:"Registro y tramesa",q:"Señala la afirmación correcta:",opts:["La Administración puede pedir siempre documentos ya aportados a otra Administración","La digitalización presencial y la copia auténtica son idénticas","EACAT se menciona para intercambios entre administraciones públicas catalanas","SIR se usa dentro de la misma unidad gestora"],c:2,f:"Es la correspondencia correcta según el resumen."},
+  {b:"Registro y tramesa",q:"¿Qué opción es incorrecta?",opts:["El registro deja constancia de fecha y hora","SIR se usa con administraciones de fuera de Cataluña","Toda documentación presencial debe digitalizarse sin excepción","La entrada introduce el documento en el circuito administrativo"],c:2,f:"El tema prevé excepciones a la digitalización."},
+  {b:"Registro y tramesa",q:"Cuando el tema habla de tramesa a otras administraciones, una idea práctica es:",opts:["No hace falta verificar confirmación en destino","Con SIR conviene revisar el estado de llegada o confirmación","Debe usarse siempre EACAT, aunque el destinatario esté fuera de Cataluña","La remisión elimina la necesidad de asiento registral"],c:1,f:"Es el consejo operativo que aparece expresamente."},
+  {b:"Registro y tramesa",q:"Señala la opción correcta sobre documentos ya aportados:",opts:["La Administración puede reclamarlos aunque pueda obtenerlos electrónicamente","No deben pedirse si pueden obtenerse electrónicamente","Solo pueden volver a pedirse a personas jurídicas","Deben aportarse de nuevo si cambió el órgano instructor"],c:1,f:"Es una de las reglas clave de la página 8."},
+  {b:"Registro y tramesa",q:"¿Cuál de estas parejas está bien asociada?",opts:["EACAT - intercambios entre administraciones catalanas","SIR - identificación con nivel medio de garantía","PACe - sistema de representación","VALid - seguimiento de remisiones fuera de Cataluña"],c:0,f:"La asociación correcta es EACAT con intercambios entre administraciones catalanas."},
+  {b:"Registro y tramesa",q:"¿Cuál de estas parejas está bien asociada?",opts:["SIR - intercambio con administraciones de fuera de Cataluña","e-Notum - validez máxima del poder","ENS - registro de entrada","ENI - archivo electrónico"],c:0,f:"SIR se usa para remisiones con administraciones externas a Cataluña."},
+  {b:"Registro y tramesa",q:"La referencia del documento o trámite forma parte de:",opts:["El contenido mínimo de la sede","La constancia que deja el registro de entrada","La vigencia del certificado","El contenido del apoderamiento apud acta"],c:1,f:"Se cita entre los elementos del asiento de entrada."},
+  {b:"Registro y tramesa",q:"Cuando el formato o soporte impide la digitalización, según el tema:",opts:["Debe forzarse el escaneo igualmente","Se siguen reglas específicas de remisión y custodia","El documento se considera inválido","Se transforma automáticamente en copia auténtica"],c:1,f:"Ese es el tratamiento previsto en el resumen."},
+  {b:"Notif., xarxa suport, registro general",q:"La notificación electrónica y la puesta a disposición en la sede son, según el tema:",opts:["Mecanismos marginales del sistema","Ejes centrales del sistema","Sustitutivos del archivo electrónico","Exclusivos de la relación entre administraciones"],c:1,f:"El resumen los califica como ejes centrales del sistema."},
+  {b:"Notif., xarxa suport, registro general",q:"En la práctica administrativa, el tema cita como canales que pueden intervenir:",opts:["e-Notum y EACAT","Solo SIR y ENS","Únicamente PACe y VALid","Registro de representación y ENI"],c:0,f:"e-Notum y EACAT se mencionan expresamente en este contexto."},
+  {b:"Notif., xarxa suport, registro general",q:"La xarxa de suport a la Administración digital presta asistencia para:",opts:["Acceder electrónicamente a trámites y procedimientos","Clasificar los sistemas ENS","Emitir sentencias firmes","Sustituir toda atención presencial"],c:0,f:"Esa es la función general atribuida a la red de apoyo."},
+  {b:"Notif., xarxa suport, registro general",q:"Entre las funciones de las oficinas de apoyo destaca:",opts:["Ayudar en la presentación electrónica","Determinar la categoría ENS del expediente","Resolver recursos contenciosos","Otorgar certificaciones notariales"],c:0,f:"Ayudar en la presentación electrónica es una función típica citada."},
+  {b:"Notif., xarxa suport, registro general",q:"También pueden:",opts:["Poner a disposición medios electrónicos cuando proceda","Modificar de oficio apoderamientos sin inscripción","Revocar certificados digitales privados","Declarar firme una resolución sancionadora"],c:0,f:"Es una de las funciones de asistencia enumeradas."},
+  {b:"Notif., xarxa suport, registro general",q:"Entre las funciones registrales/documentales de estas oficinas figura:",opts:["Inscribir representación y emitir o registrar recibo","Clasificar documentos por capítulos presupuestarios","Determinar interoperabilidad semántica","Aprobar la política de seguridad"],c:0,f:"El tema lo incluye en la lista de funciones."},
+  {b:"Notif., xarxa suport, registro general",q:"Cada Administración debe disponer de:",opts:["Un registro electrónico general","Solo registros especializados sin conexión","Una única sede sin servicios","Un archivo no interoperable"],c:0,f:"El resumen lo formula como obligación general."},
+  {b:"Notif., xarxa suport, registro general",q:"En el registro electrónico general debe asentarse:",opts:["Todo documento presentado o recibido en sus órganos, organismos o entidades dependientes","Solo los escritos iniciadores de procedimiento","Únicamente los recursos administrativos","Solo los documentos de personas jurídicas"],c:0,f:"Esa es la regla general que recoge el tema."},
+  {b:"Notif., xarxa suport, registro general",q:"Pueden existir registros propios de organismos, pero:",opts:["No pueden coexistir con el registro general","Deben estar interconectados e interoperar con el registro general","Sustituyen automáticamente al general","Funcionan solo en soporte papel"],c:1,f:"El tema prevé su existencia siempre que estén conectados e interoperen."},
+  {b:"Notif., xarxa suport, registro general",q:"El registro electrónico general debe dejar constancia de:",opts:["Fecha y hora de presentación, identidad del remitente, contenido básico y número o asiento","Solo fecha de entrada","Únicamente el órgano titular de la sede","Solo el sistema de firma utilizado"],c:0,f:"Es la información mínima que el resumen destaca."},
+  {b:"Notif., xarxa suport, registro general",q:"En la Generalitat, el registro es accesible desde:",opts:["La sede","Únicamente EACAT","Solo oficinas presenciales","El registro de representación"],c:0,f:"El tema indica que es accesible desde la sede."},
+  {b:"Notif., xarxa suport, registro general",q:"Además, el registro de la Generalitat está disponible:",opts:["Solo en horario de oficina","24/7 y emite recibo acreditativo de la presentación","Solo para sujetos obligados","Exclusivamente para registros de salida"],c:1,f:"Es la fórmula que recoge el resumen."},
+  {b:"Notif., xarxa suport, registro general",q:"La trampa clásica sobre el registro general es creer que es:",opts:["Una simple bandeja de entrada sin efectos jurídicos","Un sistema con asiento, fecha/hora, recibo y trazabilidad","Una herramienta accesible desde la sede","Un instrumento interoperable"],c:0,f:"El tema subraya que tiene efectos jurídicos y no es una mera bandeja."},
+  {b:"Notif., xarxa suport, registro general",q:"¿Qué opción es correcta sobre las oficinas de apoyo?",opts:["Solo informan verbalmente y no realizan funciones documentales","Pueden digitalizar documentos, expedir copias auténticas y otorgar apoderamientos apud acta","Carecen de relación con la presentación electrónica","Sustituyen al registro general"],c:1,f:"El resumen enumera todas esas funciones de apoyo y registrales."},
+  {b:"Notif., xarxa suport, registro general",q:"Otorgar apoderamientos apud acta y ayudar en identificación y firma electrónica son funciones de:",opts:["La xarxa de suport/oficinas de apoyo a la Administración digital","La Sindicatura de Comptes","El Comité Europeo de Protección de Datos","La Intervención General"],c:0,f:"Aparecen en la lista de funciones de las oficinas de apoyo."},
+  {b:"Notif., xarxa suport, registro general",q:"El recibo acreditativo de presentación está ligado principalmente a:",opts:["La expedición de certificados","El registro electrónico general","La actuación automatizada","La clasificación del ENI"],c:1,f:"El registro emite recibo acreditativo de la presentación."},
+  {b:"Comparativas y trampas",q:"¿Qué emparejamiento es correcto?",opts:["ENS - interoperabilidad; ENI - seguridad","Sede - asiento de entrada; registro - puerta oficial","Certificado - acredita identidad; firma - vincula con documento o acto","Copia auténtica - simple escaneo"],c:2,f:"Es una de las comparativas clave del tema."},
+  {b:"Comparativas y trampas",q:"¿Qué frase-resumen aparece como síntesis del tema?",opts:["Seguridad para proteger, interoperabilidad para conectar, sede para acceder, firma para vincular, representación para actuar por otro y registro para dejar constancia jurídica","Archivo para destruir, registro para informar y certificado para archivar","Firma para identificar y certificado para notificar","Interoperabilidad para proteger y ENS para acceder"],c:0,f:"Es la frase final de repaso del resumen."},
+  {b:"Comparativas y trampas",q:"Señala la opción incorrecta:",opts:["La representación vale solo para los trámites o categorías expresamente cubiertos","La copia auténtica exige competencia y garantías","Sede y registro son equivalentes","ENS se ocupa de la seguridad"],c:2,f:"Sede y registro no son lo mismo."},
+  {b:"Comparativas y trampas",q:"¿Qué confusión expresa mejor una trampa de examen?",opts:["Interoperabilidad no es solo compatibilidad técnica","El certificado no es sinónimo de firma","La sede no equivale al registro","Todas las anteriores"],c:3,f:"Las tres aparecen en el resumen como confusiones muy frecuentes."},
+  {b:"Comparativas y trampas",q:"Cuando el tema dice que la interoperabilidad no es solo técnica, quiere decir que:",opts:["Solo depende del hardware","También comprende dimensiones organizativa, semántica y en el tiempo","Solo afecta a archivos históricos","Se confunde con la seguridad del ENS"],c:1,f:"Resume la estructura dimensional del ENI."},
+  {b:"Comparativas y trampas",q:"La 'copia digitalizada' se diferencia de la 'copia auténtica' en que:",opts:["La segunda exige órgano competente y garantías de identidad y contenido","La segunda no puede emitirse electrónicamente","La primera tiene siempre el mismo valor que el original","La primera requiere actuación automatizada"],c:0,f:"Es una de las comparaciones nucleares del tema."},
+  {b:"Comparativas y trampas",q:"Representación inscrita y representación ilimitada:",opts:["Son equivalentes","No son equivalentes, porque la inscripción solo vale para el alcance cubierto","Solo se diferencian por la duración","Solo afectan a personas físicas"],c:1,f:"La representación inscrita no es barra libre para cualquier trámite."},
+  {b:"Comparativas y trampas",q:"Una pregunta tipo test correcta sería: ¿qué elemento deja constancia jurídica de la presentación?",opts:["La sede electrónica","La copia auténtica","El registro electrónico","El ENI"],c:2,f:"La constancia jurídica de la presentación se vincula al registro."},
+  {b:"Comparativas y trampas",q:"¿Cuál de estas afirmaciones es más fiel al tema?",opts:["La seguridad y la interoperabilidad son dos nombres para un mismo bloque","La representación inscrita equivale siempre a un poder general","La Administración digital combina rediseño organizativo, reglas jurídicas y medios tecnológicos","La firma electrónica no añade integridad"],c:2,f:"Es la idea-base del resumen."},
+  {b:"Comparativas y trampas",q:"Señala la secuencia conceptual más coherente con el tema:",opts:["ENS → registro → personal → presupuesto","Seguridad → interoperabilidad → acceso → firma → representación → constancia jurídica","Firma → archivo → salarios → incompatibilidades","Sede → recursos humanos → tributos → defensa"],c:1,f:"Reordena la frase-resumen final del tema."},
+  {b:"Comparativas y trampas",q:"¿Qué opción recoge un dato operativo del resumen?",opts:["La validez máxima ordinaria de la representación inscrita es de 5 años","La Administración puede pedir siempre originales","La sede no responde por la actualización de lo publicado","El ENI clasifica sistemas en básica, media y alta"],c:0,f:"Es un dato operativo expresamente destacado."},
+  {b:"Comparativas y trampas",q:"¿Qué opción recoge otro dato operativo del resumen?",opts:["La expedición general de copias auténticas solicitadas debe realizarse en 15 días","El PACe sustituye al registro general","idCAT-SMS es un sistema de firma del órgano","La copia auténtica no puede ser automatizada"],c:0,f:"El plazo de 15 días aparece de forma expresa en la página 7."},
+  {b:"Comparativas y trampas",q:"Si en un test aparecen juntas sede, registro, copia auténtica y representación, lo más probable es que busquen:",opts:["Que distingas funciones y no confundas conceptos próximos","Que respondas con normas presupuestarias","Que identifiques categorías del personal funcionario","Que apliques el régimen sancionador disciplinario"],c:0,f:"El tema está construido precisamente sobre comparativas y trampas de distinción conceptual."},
+  {b:"Comparativas y trampas",q:"¿Cuál de las siguientes opciones NO se corresponde con una de las 'cinco confusiones que hunden preguntas'?",opts:["Sede ≠ registro","Certificado ≠ firma","Representación inscrita ≠ vale para cualquier trámite","Archivo electrónico ≠ presupuesto anual"],c:3,f:"Las cinco confusiones citadas son otras; la del presupuesto no aparece."},
+  {b:"Comparativas y trampas",q:"Cuando una pregunta diga que el registro general es una simple bandeja de entrada, la respuesta correcta será:",opts:["Sí, porque solo canaliza documentos","No, porque tiene asiento, fecha/hora, recibo y trazabilidad con efectos jurídicos","Sí, si existe sede electrónica","No, porque sustituye a la sede"],c:1,f:"Es una de las trampas señaladas por el resumen."},
+  {b:"Comparativas y trampas",q:"La mejor síntesis del papel de la red de apoyo a la Administración digital sería:",opts:["Suplantar al ciudadano en todos los trámites","Asistir en identificación, presentación, digitalización, registro y apoderamiento","Clasificar los niveles del ENS","Resolver reclamaciones contenciosas"],c:1,f:"Resume las funciones listadas en la página 9 y el repaso final."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx];
+  document.getElementById('q-num-lbl').textContent=`Pregunta ${idx+1}`;
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog-num').textContent=`${idx+1} / ${pool.length}`;
+  document.getElementById('fill').style.width=`${((idx)/pool.length)*100}%`;
+  document.getElementById('v-pend').textContent=pool.length-(idx);
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((letter,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML=`<span class="letter">${letter}</span><span>${q.opts[i]}</span>`;
+    btn.onclick=()=>answer(i);
+    opts.appendChild(btn);
+  });
+  document.getElementById('feedback').className='';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+}
+
+function answer(sel){
+  if(answered)return;
+  answered=true;
+  const q=pool[idx];
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.c)b.classList.add('correct');
+    else if(i===sel)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='show '+(sel===q.c?'ok':'err');
+  fb.innerHTML=`<div class="fb-head">${sel===q.c?'Correcto':'Incorrecto'}</div><div class="fb-body">${q.f}</div>`;
+  document.getElementById('btn-next').style.display='block';
+  if(sel===q.c){nOk++;document.getElementById('v-ok').textContent=nOk;}
+  else{nErr++;document.getElementById('v-err').textContent=nErr;fallos.push({...q,userAns:sel});}
+}
+
+function nextQ(){idx++;render();}
+
+function showResults(){
+  document.getElementById('q-card').style.display='none';
+  document.getElementById('options').style.display='none';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-row').style.display='none';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('stats-row').style.display='none';
+  const pct=Math.round((nOk/pool.length)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  let msg='',sub='';
+  if(pct>=90){msg='Excelente dominio';sub='Estás listo para este bloque del tema.';}
+  else if(pct>=75){msg='Buen nivel';sub='Repasa los fallos y estarás a punto.';}
+  else if(pct>=60){msg='Nivel aceptable';sub='Refuerza los puntos débiles.';}
+  else{msg='Necesitas más estudio';sub='Revisa el tema y vuelve a intentarlo.';}
+  document.getElementById('res-title').textContent=msg;
+  document.getElementById('res-sub').textContent=sub;
+  if(fallos.length>0){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent=`Resumen de errores (${fallos.length})`;
+    document.getElementById('btn-fallos').style.display='inline-block';
+    const list=document.getElementById('fallos-list');
+    list.innerHTML='';
+    fallos.forEach(f=>{
+      const div=document.createElement('div');
+      div.className='fallo';
+      const letters=['A','B','C','D'];
+      div.innerHTML=`<div class="fallo-q">${f.q}</div><div class="fallo-badges"><span class="badge err">Tu respuesta: ${letters[f.userAns]}</span><span class="badge ok">Correcta: ${letters[f.c]}</span></div><div class="fallo-exp">${f.f}</div>`;
+      list.appendChild(div);
+    });
+  }else{
+    document.getElementById('btn-fallos').style.display='none';
+  }
+  document.getElementById('results').style.display='block';
+}
+
+function restart(){
+  pool=[...ALL_Q];
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+function soloFallos(){
+  if(fallos.length===0)return;
+  pool=fallos.map(f=>{const{userAns,...rest}=f;return rest;});
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('pill').textContent=`Solo fallos (${pool.length})`;
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+window.onload=()=>render();
+</script>
+</body>
+</html>
