@@ -205,6 +205,7 @@ function render(){
   document.getElementById('q-num-lbl').textContent=`Pregunta ${idx+1}`;
   document.getElementById('q-bloque-lbl').textContent=q.b;
   document.getElementById('q-text').textContent=q.q;
+  document.getElementById('pill').textContent=q.b;
   document.getElementById('prog-num').textContent=`${idx+1} / ${pool.length}`;
   document.getElementById('fill').style.width=`${((idx)/pool.length)*100}%`;
   document.getElementById('v-pend').textContent=pool.length-(idx);
