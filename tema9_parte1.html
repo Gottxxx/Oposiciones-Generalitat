@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tema 9 Parte 1/3 · Oposición Generalitat</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f7f4; --surface: #ffffff; --surface2: #f1f0ed;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+    --ok: #1a7a4a; --ok-bg: #eaf5ee; --ok-border: rgba(26,122,74,0.25);
+    --err: #c0392b; --err-bg: #fdf0ee; --err-border: rgba(192,57,43,0.25);
+    --accent: #1a1a18; --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181a; --surface: #222224; --surface2: #2a2a2c;
+      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+      --text: #f0efec; --text2: #a0a09a; --text3: #606060;
+      --ok: #4caf7a; --ok-bg: rgba(76,175,122,0.12); --ok-border: rgba(76,175,122,0.3);
+      --err: #e57373; --err-bg: rgba(229,115,115,0.12); --err-border: rgba(229,115,115,0.3);
+      --accent: #f0efec;
+    }
+  }
+  html { font-size: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem 4rem; }
+  #app { width: 100%; max-width: 680px; }
+  #header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  #header h1 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+  #header p { font-size: 13px; color: var(--text3); }
+  #pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-strong); color: var(--text2); background: var(--surface2); white-space: nowrap; flex-shrink: 0; }
+  #progress-wrap { margin-bottom: 1.25rem; }
+  #progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 7px; }
+  #progress-row span:last-child { font-weight: 500; color: var(--text2); }
+  #track { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  #fill { height: 3px; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+  #stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  #sc-ok .val { color: var(--ok); }
+  #sc-err .val { color: var(--err); }
+  #q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  #q-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #q-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-strong); display: inline-block; }
+  #q-text { font-size: 16px; color: var(--text); line-height: 1.65; }
+  #options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt { display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 14px; color: var(--text); cursor: pointer; text-align: left; line-height: 1.55; transition: border-color 0.15s, background 0.15s, transform 0.1s; width: 100%; }
+  .opt:hover:not(.disabled) { border-color: var(--border-strong); background: var(--surface2); transform: translateY(-1px); }
+  .opt:active:not(.disabled) { transform: translateY(0); }
+  .letter { min-width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; margin-top: 1px; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .opt.correct { border-color: var(--ok-border); background: var(--ok-bg); }
+  .opt.correct .letter { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.wrong { border-color: var(--err-border); background: var(--err-bg); }
+  .opt.wrong .letter { background: var(--err); border-color: var(--err); color: #fff; }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  #feedback { display: none; border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 1rem; border: 1px solid; font-size: 13px; line-height: 1.65; }
+  #feedback.show { display: block; }
+  #feedback.ok { background: var(--ok-bg); border-color: var(--ok-border); }
+  #feedback.err { background: var(--err-bg); border-color: var(--err-border); }
+  #feedback .fb-head { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+  #feedback.ok .fb-head { color: var(--ok); }
+  #feedback.err .fb-head { color: var(--err); }
+  #feedback .fb-body { color: var(--text2); }
+  #btn-row { display: flex; justify-content: flex-end; }
+  #btn-next { display: none; font-size: 13px; font-weight: 500; padding: 10px 20px; border-radius: var(--radius-sm); background: var(--accent); color: var(--bg); border: none; cursor: pointer; transition: opacity 0.15s; }
+  #btn-next:hover { opacity: 0.85; }
+  #results { display: none; padding: 1rem 0; }
+  #res-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 2rem; }
+  #res-pct { font-size: 64px; font-weight: 700; color: var(--text); letter-spacing: -0.04em; line-height: 1; flex-shrink: 0; }
+  #res-info h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #res-info p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  #res-btns { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .btn-sec { font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; transition: background 0.15s; }
+  .btn-sec:hover { background: var(--surface2); }
+  .btn-prim { background: var(--accent); color: var(--bg); border-color: transparent; }
+  .btn-prim:hover { opacity: 0.85; background: var(--accent); }
+  #fallos-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  #fallos-section h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .fallo { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .fallo:last-child { border-bottom: none; }
+  .fallo-q { font-size: 14px; color: var(--text); margin-bottom: 8px; line-height: 1.5; font-weight: 500; }
+  .fallo-badges { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .badge.err { background: var(--err-bg); border-color: var(--err-border); color: var(--err); }
+  .badge.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .fallo-exp { font-size: 12px; color: var(--text3); line-height: 1.6; }
+  @media (max-width: 500px) { body { padding: 1rem 0.75rem 3rem; } #res-hero { flex-direction: column; gap: 1rem; align-items: flex-start; } #res-pct { font-size: 48px; } #header { flex-direction: column; gap: 0.75rem; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <h1>Tema 9 Parte 1/3 · Oposición Generalitat</h1>
+      <p>55 preguntas · Atención ciudadana: conceptos básicos</p>
+    </div>
+    <div id="pill"></div>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-row"><span>Progreso</span><span id="prog-num">1 / 55</span></div>
+    <div id="track"><div id="fill"></div></div>
+  </div>
+  <div id="stats-row">
+    <div class="stat" id="sc-ok"><div class="lbl">Correctas</div><div class="val" id="v-ok">0</div></div>
+    <div class="stat" id="sc-err"><div class="lbl">Errores</div><div class="val" id="v-err">0</div></div>
+    <div class="stat"><div class="lbl">Pendientes</div><div class="val" id="v-pend">55</div></div>
+  </div>
+  <div id="q-card">
+    <div id="q-meta"><span id="q-num-lbl"></span><span class="dot"></span><span id="q-bloque-lbl"></span></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="btn-row"><button id="btn-next" onclick="nextQ()">Siguiente →</button></div>
+  <div id="results">
+    <div id="res-hero">
+      <div id="res-pct"></div>
+      <div id="res-info"><h2 id="res-title"></h2><p id="res-sub"></p></div>
+    </div>
+    <div id="res-btns">
+      <button class="btn-sec btn-prim" onclick="restart()">Repetir completo</button>
+      <button class="btn-sec" id="btn-fallos" onclick="soloFallos()">Solo preguntas falladas →</button>
+    </div>
+    <div id="fallos-section" style="display:none">
+      <h3 id="fallos-title"></h3>
+      <div id="fallos-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALL_Q = [
+  {b:"Definiciones básicas",q:"¿Qué concepto se define como 'el personal de la propia Administración que recibe apoyo o información de otro empleado público'?",opts:["cliente interno","cliente externo","percepción","expectativa"],c:0,f:"Cliente interno es el personal de la Administración."},
+  {b:"Definiciones básicas",q:"¿Qué concepto se define como 'la ciudadanía que solicita información, asistencia o resolución de un trámite'?",opts:["cliente interno","cliente externo","percepción","expectativa"],c:1,f:"Cliente externo es la ciudadanía que solicita servicios."},
+  {b:"Definiciones básicas",q:"¿Qué concepto se define como 'la valoración subjetiva que la persona construye sobre la realidad y sobre el servicio recibido'?",opts:["cliente interno","cliente externo","percepción","expectativa"],c:2,f:"Percepción es la valoración subjetiva del servicio."},
+  {b:"Definiciones básicas",q:"¿Qué concepto se define como 'lo que la persona cree que va a ocurrir o que debería ocurrir'?",opts:["cliente interno","cliente externo","percepción","expectativa"],c:3,f:"Expectativa es lo que la persona espera que ocurra."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'quien transmite el mensaje'?",opts:["emisor","cliente interno","cliente externo","percepción"],c:0,f:"Emisor es quien transmite el mensaje."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'quien recibe el mensaje'?",opts:["cliente interno","receptor","cliente externo","percepción"],c:1,f:"Receptor es quien recibe el mensaje."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'el contenido transmitido'?",opts:["cliente interno","cliente externo","mensaje","percepción"],c:2,f:"Mensaje es el contenido transmitido."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'el medio por el que circula la comunicación'?",opts:["cliente interno","cliente externo","percepción","canal"],c:3,f:"Canal es el medio por el que circula la comunicación."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'el lenguaje o sistema utilizado para comunicar'?",opts:["código","cliente interno","cliente externo","percepción"],c:0,f:"Código es el lenguaje o sistema utilizado."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'la perturbación que dificulta o altera el proceso comunicativo'?",opts:["cliente interno","ruido","cliente externo","percepción"],c:1,f:"Ruido es la perturbación que dificulta la comunicación."},
+  {b:"Escucha",q:"¿Qué concepto se define como 'la forma de escuchar que presta atención real, pregunta, resume y demuestra comprensión'?",opts:["cliente interno","cliente externo","escucha activa","percepción"],c:2,f:"Escucha activa incluye atención, preguntas y demostración de comprensión."},
+  {b:"Escucha",q:"¿Qué concepto se define como 'la forma de escucha basada en señales no verbales como asentir, mirar o sonreír'?",opts:["cliente interno","cliente externo","percepción","escucha pasiva"],c:3,f:"Escucha pasiva se basa en señales no verbales."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'la retroalimentación que permite comprobar si el mensaje se ha entendido bien'?",opts:["feedback","cliente interno","cliente externo","percepción"],c:0,f:"Feedback es la retroalimentación para verificar comprensión."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'la paráfrasis de lo que dice el interlocutor para afinar el problema real'?",opts:["cliente interno","reformulación","cliente externo","percepción"],c:1,f:"Reformulación es parafrasear para clarificar."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'el intento de influir para que la otra persona acepte una posición'?",opts:["cliente interno","cliente externo","persuasión","percepción"],c:2,f:"Persuasión es influir para lograr adhesión."},
+  {b:"Comunicación",q:"¿Qué concepto se define como 'la búsqueda de acuerdo mutuo entre partes con intereses distintos'?",opts:["cliente interno","cliente externo","percepción","negociación"],c:3,f:"Negociación es buscar acuerdo mutuo."},
+  {b:"Trato profesional",q:"¿Qué concepto se define como 'la defensa correcta de ideas y límites sin agresividad ni sumisión'?",opts:["asertividad","cliente interno","cliente externo","percepción"],c:0,f:"Asertividad es defender límites sin agresividad ni sumisión."},
+  {b:"Trato profesional",q:"¿Qué concepto se define como 'la comprensión de la perspectiva, emociones y expectativas del ciudadano sin perder el rol profesional'?",opts:["cliente interno","empatía","cliente externo","percepción"],c:1,f:"Empatía es comprender sin perder el rol profesional."},
+  {b:"Oficinas",q:"¿Qué concepto se define como 'la oficina que asume funciones de asistencia en materia de registro y otras tareas derivadas'?",opts:["cliente interno","cliente externo","oficina de atención ciudadana","percepción"],c:2,f:"Oficina de atención ciudadana asume funciones de asistencia registral."},
+  {b:"Oficinas",q:"¿Qué concepto se define como 'el servicio centrado en registrar y digitalizar documentación'?",opts:["cliente interno","cliente externo","percepción","punto de registro y digitalización"],c:3,f:"Punto de registro y digitalización se centra en registrar y digitalizar."},
+  {b:"Tipos de ciudadano",q:"¿Qué concepto se define como 'la persona que expresa poco, duda y necesita ayuda para concretar su necesidad'?",opts:["ciudadano pasivo","cliente interno","cliente externo","percepción"],c:0,f:"Ciudadano pasivo expresa poco y necesita ayuda."},
+  {b:"Tipos de ciudadano",q:"¿Qué concepto se define como 'la persona que exige, protesta o alza el tono y requiere contención y escucha sin choque frontal'?",opts:["cliente interno","ciudadano agresivo","cliente externo","percepción"],c:1,f:"Ciudadano agresivo exige y protesta, requiere contención."},
+  {b:"Tipos de ciudadano",q:"¿Qué concepto se define como 'la persona que muestra hostilidad encubierta, ironía, bloqueo o resistencia'?",opts:["cliente interno","cliente externo","ciudadano pasivo-agresivo","percepción"],c:2,f:"Ciudadano pasivo-agresivo muestra hostilidad encubierta."},
+  {b:"Tipos de ciudadano",q:"¿Qué concepto se define como 'la persona que expresa con claridad y respeto su necesidad'?",opts:["cliente interno","cliente externo","percepción","ciudadano asertivo"],c:3,f:"Ciudadano asertivo expresa con claridad y respeto."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de cliente interno?",opts:["la ciudadanía que solicita información","el personal de la propia Administración que recibe apoyo","la valoración subjetiva","lo que la persona espera"],c:1,f:"Cliente interno es el personal de la Administración."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de cliente externo?",opts:["el personal de la Administración","la valoración subjetiva","la ciudadanía que solicita información","lo que la persona espera"],c:2,f:"Cliente externo es la ciudadanía."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de percepción?",opts:["el personal de la Administración","la ciudadanía que solicita información","lo que la persona espera","la valoración subjetiva"],c:3,f:"Percepción es la valoración subjetiva."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de expectativa?",opts:["lo que la persona espera","el personal de la Administración","la ciudadanía","la valoración subjetiva"],c:0,f:"Expectativa es lo que se espera que ocurra."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de emisor?",opts:["el personal de la Administración","quien transmite el mensaje","la ciudadanía","la valoración subjetiva"],c:1,f:"Emisor es quien transmite el mensaje."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de receptor?",opts:["el personal de la Administración","la ciudadanía","quien recibe el mensaje","la valoración subjetiva"],c:2,f:"Receptor es quien recibe el mensaje."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de mensaje?",opts:["el personal de la Administración","la ciudadanía","la valoración subjetiva","el contenido transmitido"],c:3,f:"Mensaje es el contenido transmitido."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de canal?",opts:["el medio por el que circula la comunicación","el personal de la Administración","la ciudadanía","la valoración subjetiva"],c:0,f:"Canal es el medio de transmisión."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de código?",opts:["el personal de la Administración","el lenguaje o sistema utilizado para comunicar","la ciudadanía","la valoración subjetiva"],c:1,f:"Código es el lenguaje utilizado."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de ruido?",opts:["el personal de la Administración","la ciudadanía","la perturbación que dificulta la comunicación","la valoración subjetiva"],c:2,f:"Ruido es la perturbación que dificulta."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de escucha activa?",opts:["el personal de la Administración","la ciudadanía","la valoración subjetiva","la forma de escuchar que presta atención real"],c:3,f:"Escucha activa presta atención real y demuestra comprensión."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de escucha pasiva?",opts:["la forma de escucha basada en señales no verbales","el personal de la Administración","la ciudadanía","la valoración subjetiva"],c:0,f:"Escucha pasiva se basa en señales no verbales."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de feedback?",opts:["el personal de la Administración","la retroalimentación que permite comprobar comprensión","la ciudadanía","la valoración subjetiva"],c:1,f:"Feedback es retroalimentación para verificar."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de reformulación?",opts:["el personal de la Administración","la ciudadanía","la paráfrasis para afinar el problema","la valoración subjetiva"],c:2,f:"Reformulación es parafrasear para clarificar."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de persuasión?",opts:["el personal de la Administración","la ciudadanía","la valoración subjetiva","el intento de influir"],c:3,f:"Persuasión es influir para lograr adhesión."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de negociación?",opts:["la búsqueda de acuerdo mutuo","el personal de la Administración","la ciudadanía","la valoración subjetiva"],c:0,f:"Negociación es buscar acuerdo mutuo."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de asertividad?",opts:["el personal de la Administración","la defensa de ideas sin agresividad ni sumisión","la ciudadanía","la valoración subjetiva"],c:1,f:"Asertividad es defender límites correctamente."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de empatía?",opts:["el personal de la Administración","la ciudadanía","la comprensión sin perder el rol profesional","la valoración subjetiva"],c:2,f:"Empatía es comprender manteniendo el rol."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de oficina de atención ciudadana?",opts:["el personal de la Administración","la ciudadanía","la valoración subjetiva","la oficina que asume funciones de asistencia registral"],c:3,f:"Oficina de atención ciudadana asume funciones de asistencia."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de punto de registro y digitalización?",opts:["el servicio centrado en registrar y digitalizar","el personal de la Administración","la ciudadanía","la valoración subjetiva"],c:0,f:"Punto de registro y digitalización se centra en registro."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de ciudadano pasivo?",opts:["el personal de la Administración","la persona que expresa poco y necesita ayuda","la ciudadanía","la valoración subjetiva"],c:1,f:"Ciudadano pasivo expresa poco."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de ciudadano agresivo?",opts:["el personal de la Administración","la ciudadanía","la persona que exige y protesta","la valoración subjetiva"],c:2,f:"Ciudadano agresivo exige y protesta."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de ciudadano pasivo-agresivo?",opts:["el personal de la Administración","la ciudadanía","la valoración subjetiva","la persona que muestra hostilidad encubierta"],c:3,f:"Ciudadano pasivo-agresivo muestra hostilidad encubierta."},
+  {b:"Definiciones inversas",q:"¿Cuál es la definición correcta de ciudadano asertivo?",opts:["la persona que expresa con claridad y respeto","el personal de la Administración","la ciudadanía","la valoración subjetiva"],c:0,f:"Ciudadano asertivo expresa con claridad."},
+  {b:"Atención ciudadana",q:"¿Cuál de las siguientes opciones recoge mejor la finalidad de la atención a la ciudadanía?",opts:["Informar, orientar, ayudar y facilitar el ejercicio de derechos","Resolver siempre favorablemente","Sustituir al órgano competente","Limitarse a entregar impresos"],c:0,f:"La finalidad es informar, orientar y facilitar derechos."},
+  {b:"Atención ciudadana",q:"Según el resumen, atender bien a la ciudadanía consiste sobre todo en:",opts:["Escuchar, comprender y encauzar la respuesta","Hablar con amabilidad aunque no se entienda","Reducir el tiempo de atención","Evitar derivaciones necesarias"],c:0,f:"Atender bien implica escuchar, comprender y encauzar."},
+  {b:"Atención ciudadana",q:"La calidad de la atención condiciona especialmente:",opts:["La percepción del servicio y la confianza","La validez jurídica de las resoluciones","La existencia de silencio administrativo","La jerarquía del órgano"],c:0,f:"La calidad de atención condiciona percepción y confianza."},
+  {b:"Percepción del servicio",q:"¿Qué se entiende por elementos tangibles en la percepción global del servicio?",opts:["Instalaciones, personal, documentos y señalización","Respeto, seguridad y sensación de control","Empatía, fiabilidad y claridad","Expectativas previas"],c:0,f:"Elementos tangibles son instalaciones, personal y documentos."},
+  {b:"Percepción del servicio",q:"¿Cuál de los siguientes es un elemento intangible de la percepción del servicio?",opts:["Fiabilidad y respeto","Mostrador y señalización","Documentos entregados","Distribución física"],c:0,f:"Elementos intangibles son fiabilidad, respeto y seguridad."},
+  {b:"Percepción y expectativa",q:"Expectativa y percepción se diferencian en que:",opts:["La expectativa es lo esperado; la percepción, cómo se valora lo recibido","La percepción se forma antes del servicio","Son sinónimos","La percepción solo depende del resultado"],c:0,f:"Expectativa es lo esperado; percepción es la valoración."},
+  {b:"Tipos de ciudadano",q:"Ante una persona pasiva, la respuesta más adecuada es:",opts:["Usar preguntas abiertas y ayudar a concretar","Entrar en discusión","Responder de forma seca","Ignorar sus dudas"],c:0,f:"Con persona pasiva, usar preguntas abiertas y ayudar a concretar."}
+];
+
+let pool=[...ALL_Q],idx=0,nOk=0,nErr=0,fallos=[],answered=false;
+
+function render(){
+  if(idx>=pool.length){showResults();return;}
+  const q=pool[idx];
+  document.getElementById('q-num-lbl').textContent=`Pregunta ${idx+1}`;
+  document.getElementById('q-bloque-lbl').textContent=q.b;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog-num').textContent=`${idx+1} / ${pool.length}`;
+  document.getElementById('fill').style.width=`${((idx)/pool.length)*100}%`;
+  document.getElementById('v-pend').textContent=pool.length-(idx);
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((letter,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML=`<span class="letter">${letter}</span><span>${q.opts[i]}</span>`;
+    btn.onclick=()=>answer(i);
+    opts.appendChild(btn);
+  });
+  document.getElementById('feedback').className='';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  answered=false;
+}
+
+function answer(sel){
+  if(answered)return;
+  answered=true;
+  const q=pool[idx];
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.c)b.classList.add('correct');
+    else if(i===sel)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='show '+(sel===q.c?'ok':'err');
+  fb.innerHTML=`<div class="fb-head">${sel===q.c?'Correcto':'Incorrecto'}</div><div class="fb-body">${q.f}</div>`;
+  document.getElementById('btn-next').style.display='block';
+  if(sel===q.c){nOk++;document.getElementById('v-ok').textContent=nOk;}
+  else{nErr++;document.getElementById('v-err').textContent=nErr;fallos.push({...q,userAns:sel});}
+}
+
+function nextQ(){idx++;render();}
+
+function showResults(){
+  document.getElementById('q-card').style.display='none';
+  document.getElementById('options').style.display='none';
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('btn-row').style.display='none';
+  document.getElementById('progress-wrap').style.display='none';
+  document.getElementById('stats-row').style.display='none';
+  const pct=Math.round((nOk/pool.length)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  let msg='',sub='';
+  if(pct>=90){msg='Excelente dominio';sub='Estás listo para este bloque del tema.';}
+  else if(pct>=75){msg='Buen nivel';sub='Repasa los fallos y estarás a punto.';}
+  else if(pct>=60){msg='Nivel aceptable';sub='Refuerza los puntos débiles.';}
+  else{msg='Necesitas más estudio';sub='Revisa el tema y vuelve a intentarlo.';}
+  document.getElementById('res-title').textContent=msg;
+  document.getElementById('res-sub').textContent=sub;
+  if(fallos.length>0){
+    document.getElementById('fallos-section').style.display='block';
+    document.getElementById('fallos-title').textContent=`Resumen de errores (${fallos.length})`;
+    document.getElementById('btn-fallos').style.display='inline-block';
+    const list=document.getElementById('fallos-list');
+    list.innerHTML='';
+    fallos.forEach(f=>{
+      const div=document.createElement('div');
+      div.className='fallo';
+      const letters=['A','B','C','D'];
+      div.innerHTML=`<div class="fallo-q">${f.q}</div><div class="fallo-badges"><span class="badge err">Tu respuesta: ${letters[f.userAns]}</span><span class="badge ok">Correcta: ${letters[f.c]}</span></div><div class="fallo-exp">${f.f}</div>`;
+      list.appendChild(div);
+    });
+  }else{
+    document.getElementById('btn-fallos').style.display='none';
+  }
+  document.getElementById('results').style.display='block';
+}
+
+function restart(){
+  pool=[...ALL_Q];
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+function soloFallos(){
+  if(fallos.length===0)return;
+  pool=fallos.map(f=>{const{userAns,...rest}=f;return rest;});
+  idx=0;nOk=0;nErr=0;fallos=[];answered=false;
+  document.getElementById('v-ok').textContent='0';
+  document.getElementById('v-err').textContent='0';
+  document.getElementById('pill').textContent=`Solo fallos (${pool.length})`;
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('options').style.display='flex';
+  document.getElementById('btn-row').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('stats-row').style.display='grid';
+  document.getElementById('fallos-section').style.display='none';
+  render();
+}
+
+window.onload=()=>render();
+</script>
+</body>
+</html>
